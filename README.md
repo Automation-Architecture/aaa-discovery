@@ -1,12 +1,14 @@
 # aaa-discovery
 
-A workflow for graduating a closed sale into a **developer-ready PRD**.
+A repeatable workflow for moving a closed sale to **build-ready in days, not weeks**.
 
 ## Why this exists
 
-After a sale closes, engineering often inherits very little: a proposal (sometimes thin), a few meeting transcripts, and a vague mandate. The engineer ends up rebuilding context from scratch — or worse, building the wrong thing.
+**Discovery is the bottleneck.** New clients are onboarding faster than discovery can hand them off, and engineering sits idle waiting for clarity. Every day a project lingers in discovery is a day the build phase doesn't start.
 
-This workflow turns whatever post-sales artifacts exist into a structured discovery output rich enough that **the engineer building the web app understands it as well as the operator does**.
+This workflow exists to **unblock engineering** — to graduate post-sales artifacts (transcripts, proposals, emails) into a developer-ready PRD predictably and quickly, so build can commence without delay.
+
+Quality is the floor, not the ceiling: the PRD must still leave the engineer with a mental model as complete as the operator's. But the design constraint is **throughput** — fewer round-trips, less re-discovery, faster handoff.
 
 ## Inputs
 
@@ -42,7 +44,9 @@ Discovery proceeds even when inputs are sparse. Sparse inputs just mean more gri
 
 ## Goal
 
-The engineer reading the PRD should be able to build the web app with a mental model **as complete as the operator's**. If they can't, discovery isn't done.
+**Closed-sale to build-ready in days, not weeks** — without dropping below the quality floor (engineer's mental model = operator's).
+
+If the engineer needs a re-discovery round, throughput failed. If the build starts but builds the wrong thing, the floor failed. Both are failure modes.
 
 ## Status
 
