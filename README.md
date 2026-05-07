@@ -1,53 +1,41 @@
 # aaa-discovery
 
-A repeatable workflow for moving a closed sale to **build-ready in days, not weeks**.
+The canonical home of the **AAA Discovery** Claude Code skill — the 15-step sequence that turns a closed sale into a fully ticketed, team-reviewed, client-informed project ready for engineers to build.
 
-## Why this exists
+## What lives here
 
-**Discovery is the bottleneck.** New clients are onboarding faster than discovery can hand them off, and engineering sits idle waiting for clarity. Every day a project lingers in discovery is a day the build phase doesn't start.
-
-This workflow exists to **unblock engineering** — to graduate post-sales artifacts (transcripts, proposals, emails) into a developer-ready PRD predictably and quickly, so build can commence without delay.
-
-Quality is the floor, not the ceiling: the PRD must still leave the engineer with a mental model as complete as the operator's. But the design constraint is **throughput** — fewer round-trips, less re-discovery, faster handoff.
-
-## Inputs
-
-Whatever's available — usually some subset of:
-
-- **Meeting transcripts** (Fireflies, Granola, Zoom)
-- **Sales proposal** (full doc or just the scope section)
-- **Email threads** with the prospect/client
-- **Operator's head** — the gaps the artifacts don't fill
-
-Discovery proceeds even when inputs are sparse. Sparse inputs just mean more grilling.
-
-## Process
-
-1. **Ingest** — pull together the available transcripts, proposal text, and any other context.
-2. **Project brief** — produce a short, structured brief from those inputs (problem, audience, scope, constraints, knowns, unknowns).
-3. **Grill** — invoke the `grill-me` skill. Interrogate the operator branch by branch until every meaningful decision is resolved. This is non-negotiable; the brief is never enough on its own.
-4. **PRD** — invoke the PRD-creation skill (e.g. `to-prd`) to convert the grilled, aligned context into a developer-ready PRD.
-5. **Handoff** — PRD goes to engineering with enough fidelity that the engineer can start building without a re-discovery round.
-
-## Required skills
-
-| Skill | Role |
+| Path | What it is |
 |---|---|
-| `grill-me` | **Essential.** Resolves every branch of the decision tree by interviewing the operator until shared understanding is reached. |
-| `to-prd` (or equivalent PRD-creation skill) | Converts the aligned context into a publishable PRD. |
+| [`SKILL.md`](./SKILL.md) | The skill itself — read this first. Defines the 15 steps, output-location conventions, common pitfalls. |
+| [`references/`](./references/) | One reference file per step (`step-01-...md` through `step-15-...md`). The skill body delegates here for full playbooks, commands, and verification checks. |
+| [`templates/`](./templates/) | Bundled templates the skill uses (e.g. `project-brief.md`). |
+| [`docs/why.md`](./docs/why.md) | The throughput framing — why this skill exists and what success looks like. |
 
-## Artifacts produced
+## How it's installed
 
-- `project-brief.md` — first-pass structured summary of the inputs
-- `discovery-notes.md` — captured decisions and resolutions from the grilling round
-- `prd.md` — the developer-ready PRD (handoff artifact)
+This repo is the **canonical source of truth**. The runtime install is a hard copy at `~/.claude/skills/aaa-discovery/`. After editing the skill in this repo, sync the install (see _Sync_ below) and reload Claude Code.
 
-## Goal
+The old project-scoped location at `<aaa-client-dashboard>/.claude/skills/aaa-discovery` is a symlink back to this repo for backwards compatibility.
 
-**Closed-sale to build-ready in days, not weeks** — without dropping below the quality floor (engineer's mental model = operator's).
+## Sync
 
-If the engineer needs a re-discovery round, throughput failed. If the build starts but builds the wrong thing, the floor failed. Both are failure modes.
+After editing files in this repo:
 
-## Status
+```bash
+# from the repo root
+rsync -a --delete \
+  --exclude='.git' --exclude='README.md' --exclude='docs' \
+  ./ ~/.claude/skills/aaa-discovery/
+```
 
-Early — repo just initialized. Workflow scaffolding TBD.
+Then restart Claude Code so the skill reloads.
+
+## Editing rules
+
+- **SKILL.md is the entry point.** Every behavior change starts here, then cascades into `references/` if the relevant step needs detail.
+- **Reference files are step-scoped.** `step-NN-<name>.md` names are stable — Jira links, the dashboard, and other docs reference them.
+- **Versioning matters.** Bump the skill description's step count if you add or remove steps. The pitfalls list (in `SKILL.md`) is append-only — record gotchas as they happen on real projects.
+
+## Trigger
+
+Invoke from any project directory with `/aaa-discovery` whenever a new client engagement starts. Don't run discovery freehand — the canonical sequence catches things ad-hoc work misses.
