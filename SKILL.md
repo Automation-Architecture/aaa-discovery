@@ -16,6 +16,10 @@ Discovery is the AAA workflow that turns a sales conversation into a fully ticke
 
 The phase ends with the work fully scoped, all tickets created, the client dashboard live, all spec DOCX deliverables generated into `Client Docs/`, and a client email markdown staged for the operator to send. **Build Phase** (engineers writing code) only begins after step 15.
 
+## Throughput target
+
+**5 business days from signed SOW to step-15 complete.** This is the number every run is measured against. The two slack points are step 8 (team feedback ≤ 1 business day) and step 10 (engineer-led architecture grill ≤ 2 business days). If both hold, the rest fits easily. Slip past 7 business days end-to-end → mandatory post-mortem in `docs/throughput-log.md`. Full target rationale, slip signals, and tracking method live in `docs/why.md`.
+
 ## When to invoke
 
 Use this skill as the entry point any time a new client engagement starts — whether the operator says it explicitly (`/aaa-discovery`, "kick off discovery") or implicitly (just dropped a sales call transcript and asked what's next). Don't try to do Discovery freehand — the canonical sequence catches things ad-hoc work misses.
