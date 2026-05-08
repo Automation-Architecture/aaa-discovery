@@ -46,7 +46,7 @@ Read `spec/PRD.md` and `spec/GRILL_SESSION.md` (Round 1) end-to-end first. Many 
 - Marks each `**Decision.** _TBD_`
 - Names the engineer as owner
 
-Append it to `spec/GRILL_SESSION.md` as a new section titled **"Round 2 — Architecture & Tech Stack (Engineer-Led)"**. See the BROA Opportunity Builder GRILL_SESSION.md for a reference shape.
+Append it to `spec/GRILL_SESSION.md` as a new section titled **"Round 2 — Architecture & Tech Stack (Engineer-Led)"**. If `spec/GRILL_SESSION.md` doesn't exist yet, scaffold it from `templates/GRILL_SESSION.md` (bundled in this skill) and fill in Round 1 first. See the BROA Opportunity Builder GRILL_SESSION.md for a reference shape of a fully-completed session.
 
 ### 4. Commit and PR-merge
 
