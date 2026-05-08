@@ -6,17 +6,23 @@ A technical specification that closes every architecture decision and gives engi
 
 ## How to invoke
 
-Use the `cto-technical-architect` agent:
+First, **scaffold `spec/tech-spec.md` from the bundled template** at `templates/tech-spec.md` (in this skill). Then point the agent at the scaffolded file so it fills in the canonical structure rather than producing a divergent shape:
+
+```
+cp <skill-path>/templates/tech-spec.md <project-repo>/spec/tech-spec.md
+```
+
+Then invoke the `cto-technical-architect` agent:
 
 ```
 Agent({
   description: "Write tech spec for <Project>",
   subagent_type: "cto-technical-architect",
-  prompt: "We have an approved PRD at spec/prd.md and locked architecture decisions from /grill-me. Produce the tech spec to spec/tech-spec.md. Reference these files: <paths>. Architecture-locked items: <summary from step 9>."
+  prompt: "Fill in spec/tech-spec.md (already scaffolded from the canonical template). The PRD is at spec/prd.md. Architecture decisions are locked in spec/GRILL_SESSION.md Round 2 — every entry in §8 'Concrete Tech Choices' must come from a Round 2 Q. Reference these files: <paths>. Architecture-locked items: <summary>."
 })
 ```
 
-The agent's job is to synthesize, not to redecide. If it tries to relitigate something step 9 already settled, redirect it.
+The agent's job is to synthesize, not to redecide. If it tries to relitigate something Round 2 already settled, redirect it. If it tries to deviate from the scaffolded structure (renaming sections, dropping required ones), pull it back unless there's a real reason — consistency across projects is a feature.
 
 ## Where it lives
 
