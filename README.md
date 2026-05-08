@@ -19,16 +19,16 @@ The old project-scoped location at `<aaa-client-dashboard>/.claude/skills/aaa-di
 
 ## Sync
 
-After editing files in this repo:
+After editing files in this repo, run:
 
 ```bash
-# from the repo root
-rsync -a --delete \
-  --exclude='.git' --exclude='README.md' --exclude='docs' \
-  ./ ~/.claude/skills/aaa-discovery/
+./sync.sh             # sync to ~/.claude/skills/aaa-discovery/
+./sync.sh --dry-run   # preview what would change without touching files
 ```
 
 Then restart Claude Code so the skill reloads.
+
+The script wraps `rsync` with the canonical exclusions (`.git`, `README.md`, `docs/`, `sync.sh`, `.gitignore`) so you don't accidentally drop repo metadata or human-facing docs into the runtime install.
 
 ## Editing rules
 
