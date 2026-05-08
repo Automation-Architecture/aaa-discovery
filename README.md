@@ -9,7 +9,8 @@ The canonical home of the **AAA Discovery** Claude Code skill — the 15-step se
 | [`SKILL.md`](./SKILL.md) | The skill itself — read this first. Defines the 15 steps, output-location conventions, common pitfalls. |
 | [`references/`](./references/) | One reference file per step (`step-01-...md` through `step-15-...md`). The skill body delegates here for full playbooks, commands, and verification checks. |
 | [`templates/`](./templates/) | Bundled templates the skill uses (e.g. `project-brief.md`). |
-| [`docs/why.md`](./docs/why.md) | The throughput framing — why this skill exists and what success looks like. |
+| [`docs/why.md`](./docs/why.md) | The throughput framing, target (≤ 5 business days), slip signals, and how throughput is measured. |
+| [`docs/throughput-log.md`](./docs/throughput-log.md) | Append-only ledger of every Discovery run's wall-clock — ground truth for whether the workflow is moving the bottleneck. |
 
 ## How it's installed
 
@@ -39,3 +40,23 @@ The script wraps `rsync` with the canonical exclusions (`.git`, `README.md`, `do
 ## Trigger
 
 Invoke from any project directory with `/aaa-discovery` whenever a new client engagement starts. Don't run discovery freehand — the canonical sequence catches things ad-hoc work misses.
+
+## Worked example
+
+The first end-to-end run of this flow was the **Kidneyhood Zendesk AI Agent** project ([`Automation-Architecture/kidneyhood-zendesk-agent`](https://github.com/Automation-Architecture/kidneyhood-zendesk-agent)). Use it as a reference for what the artifacts look like in practice — not just what the templates promise.
+
+| Step(s) | Artifact | Where to look |
+|---|---|---|
+| 3, 9 | Project brief (v1.5 by close of discovery) | [`spec/project-brief.md`](https://github.com/Automation-Architecture/kidneyhood-zendesk-agent/blob/main/spec/project-brief.md) |
+| 5, 9 | PRD | [`spec/prd.md`](https://github.com/Automation-Architecture/kidneyhood-zendesk-agent/blob/main/spec/prd.md) |
+| 11 | Tech spec | [`spec/tech-spec.md`](https://github.com/Automation-Architecture/kidneyhood-zendesk-agent/blob/main/spec/tech-spec.md) |
+| 12 | Jira board | `KHZ` project on `automationarchitecture.atlassian.net` (9 Epics + 60 Tasks at discovery close) |
+| 15 | Client handoff email | [`client-comms/email-to-lee-discovery-handoff.md`](https://github.com/Automation-Architecture/kidneyhood-zendesk-agent/blob/main/client-comms/email-to-lee-discovery-handoff.md) |
+
+A few caveats worth knowing before treating this run as canonical:
+
+- **No `GRILL_SESSION.md`.** The KH run predates the bundled grill-session template — both rounds happened ad-hoc in chat. Future runs use `templates/GRILL_SESSION.md` to capture decisions in-repo.
+- **Project key churn (`KZA` → `KHZ`).** This is pitfall #1 in `SKILL.md`. The KH run is what taught us to sweep for it.
+- **DOCX path discipline learned mid-flight.** Early DOCX got generated into the repo; we cleaned them out and moved generation directly into `Client Docs/`. The final state matches the convention; the git history shows the migration.
+
+Treat the artifact shapes as the reference, not the process — the process is what `SKILL.md` and the `references/` files describe today, refined from the KH lessons.
