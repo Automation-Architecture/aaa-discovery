@@ -60,3 +60,7 @@ A few caveats worth knowing before treating this run as canonical:
 - **DOCX path discipline learned mid-flight.** Early DOCX got generated into the repo; we cleaned them out and moved generation directly into `Client Docs/`. The final state matches the convention; the git history shows the migration.
 
 Treat the artifact shapes as the reference, not the process — the process is what `SKILL.md` and the `references/` files describe today, refined from the KH lessons.
+
+## Template / external distribution
+
+A generalized, org-neutral version of this skill is available for external distribution at [`Automation-Architecture/aaa-discovery-template`](https://github.com/Automation-Architecture/aaa-discovery-template) (public). That repo replaces all AAA-specific values with placeholders and includes an `install.sh` for end users. When making substantive improvements to the skill (new steps, refined reference files, new pitfalls), port them to the template as well.
