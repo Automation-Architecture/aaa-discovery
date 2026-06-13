@@ -18,6 +18,25 @@ This repo is the **canonical source of truth**. The runtime install is a hard co
 
 The old project-scoped location at `<aaa-client-dashboard>/.claude/skills/aaa-discovery` is a symlink back to this repo for backwards compatibility.
 
+## Team installation
+
+To install the skill on your machine:
+
+```bash
+git clone git@github.com:Automation-Architecture/aaa-discovery.git
+cd aaa-discovery
+./sync.sh
+```
+
+Then restart Claude Code. The skill will be available as `/aaa-discovery` in any project directory.
+
+To pick up future updates, pull and re-run `sync.sh`:
+
+```bash
+git pull
+./sync.sh
+```
+
 ## Sync
 
 After editing files in this repo, run:
