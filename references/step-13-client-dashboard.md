@@ -21,7 +21,7 @@ project:
   name: "<Project Name>"
   client: "<Client first name>"
   slug: "<project-slug>"
-  slack_contact_channel: "#client-comms"
+  slack_contact_channel: ""  # not used — no client-facing Slack channel
   api_base_url: "https://<slug>.railway.app"  # placeholder until prod is up
   stage: "discovery"
   closed_stages: []

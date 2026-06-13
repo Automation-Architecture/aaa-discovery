@@ -6,7 +6,7 @@ Get the internal team to read the brief and PRD before they reach the client. Th
 
 ## The channel
 
-`#next` — Slack channel for project review. **Not** the client-facing channel (typically `#client-comms`). Don't mix them up.
+`#next` — Slack channel for project review.
 
 ## How to do it
 
@@ -30,7 +30,6 @@ Tell the operator:
 
 ## Don't do this
 
-- **Don't post to `#client-comms`.** That's a client-facing channel.
 - **Don't paste the brief/PRD content into the Slack message.** They're DOCX deliverables — the team should download and review.
 - **Don't proceed to step 8 before feedback comes in.** If the team is silent for too long, ping them — but don't substitute your own self-review for their feedback. The whole point of step 7 is outside eyes.
 

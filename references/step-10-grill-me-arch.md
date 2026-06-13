@@ -20,7 +20,7 @@ This is the default flow. The operator stages the round; the engineer runs it.
 
 Find the assigned engineer for this project. Sources, in order:
 
-- The project's Jira board (assignee on `<KEY>-1` Discovery & Setup epic, or asked in `#client-comms`)
+- The project's Jira board (assignee on `<KEY>-1` Discovery & Setup epic)
 - The project's Slack sprint channel — look for the most recent `Minh Anh / PM` "I'll assign this project to <@engineer>" message
 - The aaa-client-dashboard's project record
 
@@ -34,7 +34,7 @@ Convention: `#<slug>-sprint` (e.g. `#broa-opps-builder-sprint`). Confirm via Sla
 mcp__claude_ai_Slack__slack_search_channels(query="<slug>")
 ```
 
-Pick the `*-sprint` channel (not `*-discovery`, `*-blocked`, or the client-facing `#client-comms`). If it doesn't exist, the discovery hasn't reached the build-phase channel rename — flag to the operator.
+Pick the `*-sprint` channel (not `*-discovery` or `*-blocked`). If it doesn't exist, the discovery hasn't reached the build-phase channel rename — flag to the operator.
 
 ### 3. Stage the architecture grill stub
 
