@@ -14,22 +14,22 @@ If the engineer needs a re-discovery round, **throughput failed**. If the build 
 
 ## The target
 
-**5 business days from signed SOW to step-15 complete (build-ready).** This is the number we measure against on every run. Beat it where we can; flag and post-mortem when we miss it.
+**48 hours from signed SOW to step-15 complete (build-ready).** This is the number we measure against on every run. Beat it where we can; flag and post-mortem when we miss it.
 
 ### Sub-targets — the two slack points
 
 Most of the 15 steps are operator-driven and fast. Two have external dependencies that drive the wall-clock:
 
-- **Step 8 → 9 (team feedback in `#next`):** ≤ 1 business day. If `#next` hasn't responded within 1 business day of the post, nudge in-thread.
-- **Step 10 (engineer-led architecture grill):** ≤ 2 business days from operator stages questions → engineer fills the last `Decision.` line. If the engineer hasn't picked it up within 1 business day of the Slack handoff, escalate to PM.
+- **Step 8 → 9 (team feedback in `#next`):** ≤ 8 hours. If `#next` hasn't responded within 8 hours of the post, nudge in-thread.
+- **Step 10 (engineer-led architecture grill):** ≤ 16 hours from operator stages questions → engineer fills the last `Decision.` line. If the engineer hasn't picked it up within 8 hours of the Slack handoff, escalate to PM.
 
-If both sub-targets hold, the remaining steps comfortably fit inside 2 business days.
+If both sub-targets hold, the remaining steps comfortably fit inside 24 hours.
 
 ### Slip signals (when to escalate)
 
-- **Day 3 with no PRD locked** (steps 1–5 incomplete) → operator-side bottleneck. Block off time and finish; don't drift.
-- **Day 5 with `GRILL_SESSION.md` Round 2 still has open `_TBD_` lines** → engineer-side bottleneck. Escalate to PM.
-- **End-to-end > 7 business days** → mandatory post-mortem. Log root cause in `docs/throughput-log.md` so the pattern doesn't repeat across projects.
+- **Hour 16 with no PRD locked** (steps 1–5 incomplete) → operator-side bottleneck. Block off time and finish; don't drift.
+- **Hour 36 with `GRILL_SESSION.md` Round 2 still has open `_TBD_` lines** → engineer-side bottleneck. Escalate to PM.
+- **End-to-end > 72 hours** → mandatory post-mortem. Log root cause in `docs/throughput-log.md` so the pattern doesn't repeat across projects.
 
 ### How throughput is measured
 

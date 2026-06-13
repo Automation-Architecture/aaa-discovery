@@ -9,7 +9,7 @@ The canonical home of the **AAA Discovery** Claude Code skill — the 15-step se
 | [`SKILL.md`](./SKILL.md) | The skill itself — read this first. Defines the 15 steps, output-location conventions, common pitfalls. |
 | [`references/`](./references/) | One reference file per step (`step-01-...md` through `step-15-...md`). The skill body delegates here for full playbooks, commands, and verification checks. |
 | [`templates/`](./templates/) | Bundled templates the skill uses (e.g. `project-brief.md`). |
-| [`docs/why.md`](./docs/why.md) | The throughput framing, target (≤ 5 business days), slip signals, and how throughput is measured. |
+| [`docs/why.md`](./docs/why.md) | The throughput framing, target (≤ 48 hours), slip signals, and how throughput is measured. |
 | [`docs/throughput-log.md`](./docs/throughput-log.md) | Append-only ledger of every Discovery run's wall-clock — ground truth for whether the workflow is moving the bottleneck. |
 
 ## How it's installed

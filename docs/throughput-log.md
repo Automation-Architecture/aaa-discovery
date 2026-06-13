@@ -2,7 +2,7 @@
 
 Running record of every Discovery run's wall-clock — signed SOW → step 15 complete. Append-only. One line per project.
 
-**Target:** ≤ 5 business days. Slip past 7 → post-mortem (note root cause in the line).
+**Target:** ≤ 48 hours. Slip past 72 hours → post-mortem (note root cause in the line).
 
 **Format:**
 
