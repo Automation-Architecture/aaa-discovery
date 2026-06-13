@@ -18,7 +18,7 @@ The phase ends with the work fully scoped, all tickets created, the client dashb
 
 ## Throughput target
 
-**5 business days from signed SOW to step-15 complete.** This is the number every run is measured against. The two slack points are step 8 (team feedback ≤ 1 business day) and step 10 (engineer-led architecture grill ≤ 2 business days). If both hold, the rest fits easily. Slip past 7 business days end-to-end → mandatory post-mortem in `docs/throughput-log.md`. Full target rationale, slip signals, and tracking method live in `docs/why.md`.
+**48 hours from signed SOW to step-15 complete.** This is the number every run is measured against. The two slack points are step 8 (team feedback ≤ 8 hours) and step 10 (engineer-led architecture grill ≤ 16 hours). If both hold, the rest fits easily. Slip past 72 hours end-to-end → mandatory post-mortem in `docs/throughput-log.md`. Full target rationale, slip signals, and tracking method live in `docs/why.md`.
 
 ## When to invoke
 
@@ -34,7 +34,6 @@ Gather these before starting Step 1. Many will be visible in the sales call tran
 - **Slug** — kebab-case, used for repo + dashboard + Jira workflow — e.g., "kidneyhood-zendesk-agent"
 - **Client initials directory** — short identifier for the local working dir — e.g., "kh" → `~/Documents/aaa/client_projects/kh/`
 - **Slack channels:**
-  - Client-facing: typically `#client-comms`
   - Team feedback: `#next`
   - **Project sprint channel: `#<slug>-sprint`** (e.g. `#broa-opps-builder-sprint`) — this is where the step-10 architecture-grill handoff to the engineer happens. If it doesn't exist yet at kickoff, that's fine — it's typically created during discovery when the project is renamed `*-discovery` → `*-build` → `*-sprint`. Confirm it exists before reaching step 10.
 - **Assigned engineer** — name + Slack user ID. Often not known at kickoff; gets assigned by Minh Anh / PM mid-discovery. Must be known by step 10 — that's when they pick up the architecture grill.
@@ -78,7 +77,7 @@ These match the operator's global rules. Reread them periodically; the temptatio
 - **Memory** for the project lives at `~/.claude/projects/-Users-brad-Documents-aaa-client-projects-<initials>-repo-<project>/memory/`.
 - **No financial information in any technical doc** — no budget, no pricing, no payment status, no proposal terms. That belongs in `Client Docs/<Client>/proposal/` and the sales conversation only. If you find financial info in a tech doc, remove it.
 - **GitHub repos** go under the `Automation-Architecture` org, never personal accounts.
-- **Slack channel for team feedback is `#next`**, separate from the client-facing `#client-comms`.
+- **Slack channel for team feedback is `#next`.**
 
 ## Tools and skills used across the 15 steps
 
