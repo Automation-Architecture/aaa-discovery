@@ -167,7 +167,7 @@ _Only if UX is a major scope area. Wireframes, accessibility targets (WCAG level
 
 ### C. Work Packages & Sequencing
 
-_If sequencing the build is non-obvious. Each package = a coherent slice with dependencies + effort estimate. Maps to Jira epics in step 12._
+_If sequencing the build is non-obvious. Each package = a coherent slice with dependencies + effort estimate. Maps to Jira epics in step 10._
 
 ### D. Risks & Mitigations
 
@@ -190,6 +190,6 @@ _If the tech-spec process surfaced contradictions between the brief, PRD, propos
 - [ ] Every Round 2 decision in `GRILL_SESSION.md` is reflected somewhere in this doc
 - [ ] No financial info anywhere (no pricing, deposits, payment status, contract terms)
 - [ ] Assigned engineer has read end-to-end and signed off
-- [ ] DOCX generated to `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` (happens in step 14, not here)
+- [ ] DOCX generated to `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` (happens in step 12, not here)
 
-When all six are checked, Discovery moves to step 12 (board population via `board-nanny`).
+When all six are checked, Discovery moves to step 10 (board population via `board-nanny`).

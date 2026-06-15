@@ -1,8 +1,8 @@
-# Step 14 — Generate spec DOCX deliverables into Client Docs
+# Step 12 — Generate spec DOCX deliverables into Client Docs
 
 ## Goal
 
-Every spec markdown source is rendered to a polished DOCX in `Client Docs/<Client Full Business Name>/`. This is the step that produces the deliverables the operator attaches to the client email (step 15). By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources — not stale from earlier in the flow when the brief or PRD got version-bumped after team feedback.
+Every spec markdown source is rendered to a polished DOCX in `Client Docs/<Client Full Business Name>/`. This is the step that produces the DOCX deliverables referenced in the step 13 discovery digest. By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
 
 This step also enforces the global rule that DOCX deliverables live **only** in `Client Docs/<Client>/`, never in the repo.
 
@@ -54,7 +54,7 @@ If `Client Docs/<Client>/<area>/` doesn't exist, create it first. The full clien
 
 The DOCX filename's version must match the markdown source's version frontmatter. If you bumped the PRD from v1.1 to v1.2 after the tech-spec step, the DOCX must be `<Client>-<Project>-PRD-v1.2.docx`.
 
-**Replace, don't accumulate.** When you bump from v1.1 to v1.2, delete the v1.1 DOCX from `Client Docs/<Client>/prd/<slug>/` after confirming v1.2 exists. Stale DOCX files in Client Docs cause the operator to attach an old version to the client email by mistake.
+**Replace, don't accumulate.** When you bump from v1.1 to v1.2, delete the v1.1 DOCX from `Client Docs/<Client>/prd/<slug>/` after confirming v1.2 exists. Stale DOCX files in Client Docs create version ambiguity when referenced in the step 13 digest.
 
 ```bash
 # After v1.2 is confirmed:
@@ -84,7 +84,7 @@ rm "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>
 - **Don't generate to the repo first and `cp` to Client Docs.** Pandoc writes straight there. The repo never sees a DOCX.
 - **Don't convert `GRILL_SESSION.md` or other internal-only files.** Client doesn't need them; they often contain candid internal reasoning, version-dump-style decisions, or rep names that don't belong in client deliverables.
 - **Don't skip the version in the filename.** `<Client>-<Project>-PRD.docx` (no version) makes it impossible to tell which version is current. Always include `-v<X.Y>`.
-- **Don't accumulate vintage versions.** Old DOCX in Client Docs creates ambiguity at the email step. Replace, don't add.
+- **Don't accumulate vintage versions.** Old DOCX in Client Docs creates ambiguity at the digest step. Replace, don't add.
 - **Don't include financial info.** Same global rule. If the markdown has it, remove it from the source first, then convert.
 
 ## Done when
@@ -95,4 +95,4 @@ rm "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>
 - No prior-version DOCX still sitting in Client Docs
 - All three files open cleanly in Word/Pages without rendering errors
 
-Move to step 15 (client email) — that step references these DOCX paths directly.
+Move to step 13 (discovery digest) — that step lists these DOCX paths in the `#po` message.

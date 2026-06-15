@@ -1,14 +1,14 @@
-# Step 12 — Create client dashboard entry (`/aaa-client-init`)
+# Step 11 — Create client dashboard entry (`/aaa-client-init`)
 
 ## Goal
 
 Register the new project on the AAA client dashboard so the client gets a stable URL (`https://dashboard.automationarchitecture.ai/client/<slug>`) where they can see live status — sprint progress, GitHub activity, weekly updates, document library, horizon.
 
-The client dashboard reads from Jira (sprint data) and GitHub (activity), so step 11 needs to be complete first or there's nothing to display.
+The client dashboard reads from Jira (sprint data) and GitHub (activity), so step 10 needs to be complete first or there's nothing to display.
 
 ## Prerequisites
 
-- Jira board populated (step 11) so the dashboard's sync workflow has data to pull
+- Jira board populated (step 10) so the dashboard's sync workflow has data to pull
 - GitHub repo created (step 6) so the activity feed has commits
 - A `project.config.yaml` in the project repo with the slug, contact channel, and other metadata
 
@@ -84,4 +84,4 @@ The skill (which lives in `aaa-client-dashboard/.claude/skills/aaa-client-init/`
 
 ## Done when
 
-Dashboard entry is live and the client URL loads with at least placeholder data. Move to step 13.
+Dashboard entry is live and the client URL loads with at least placeholder data. Move to step 12.

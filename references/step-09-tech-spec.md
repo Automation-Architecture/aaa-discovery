@@ -1,4 +1,4 @@
-# Step 10 — Write the tech spec
+# Step 9 — Write the tech spec
 
 ## Goal
 
@@ -54,7 +54,7 @@ The agent will follow its own template, but a complete tech spec normally includ
   - For the main flows: end-to-end with all actors
 
 ## Concrete Tech Choices
-  - Final picks (locked by step 9): runtime versions, library versions, service tiers
+  - Final picks (locked by step 8): runtime versions, library versions, service tiers
 
 ## Deployment
   - Infra-as-code or stepwise commands
@@ -84,11 +84,11 @@ The agent will follow its own template, but a complete tech spec normally includ
    - **No reintroduced scope** the PRD declared out
    - **Concrete versions** (e.g., "Python 3.12", "Postgres 16", "Pinecone serverless tier") — not "TBD"
 2. Commit and push to the project repo
-3. Generate the DOCX into `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` — the client may want to see this too (step 13's email includes it)
+3. Generate the DOCX into `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` — referenced in the step 13 discovery digest
 
 ## Don't do this
 
-- **Don't let the tech spec contradict the PRD.** They're co-authored documents. If the tech spec needs to deviate, update the PRD too (and consider whether you need to re-run step 9).
+- **Don't let the tech spec contradict the PRD.** They're co-authored documents. If the tech spec needs to deviate, update the PRD too (and consider whether you need to re-run step 8).
 - **Don't put implementation details in the brief or PRD.** Specific versions, library choices, service tiers go here, not in the upstream docs.
 
 ## Verify before moving on
@@ -100,4 +100,4 @@ The agent will follow its own template, but a complete tech spec normally includ
 
 ## Done when
 
-Tech spec is written and committed. Move to step 11.
+Tech spec is written and committed. Move to step 10.

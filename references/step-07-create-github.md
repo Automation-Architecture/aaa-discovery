@@ -48,7 +48,7 @@ gh repo create Automation-Architecture/<slug> \
 
 - [`spec/project-brief.md`](spec/project-brief.md) — project scope, goals, success metrics
 - [`spec/prd.md`](spec/prd.md) — product requirements (user stories, modules, testing)
-- [`spec/tech-spec.md`](spec/tech-spec.md) — technical specification (added in step 10)
+- [`spec/tech-spec.md`](spec/tech-spec.md) — technical specification (added in step 9)
 
 ## Status
 

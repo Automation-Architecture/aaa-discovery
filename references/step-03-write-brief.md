@@ -2,7 +2,7 @@
 
 ## Goal
 
-A short, scannable document (~5–10 minutes to read) that captures the problem, the proposed solution, scope, success metrics, risks, and stakeholders. The brief is the input to the first `/grill-me` round and to team feedback in step 7.
+A short, scannable document (~5–10 minutes to read) that captures the problem, the proposed solution, scope, success metrics, risks, and stakeholders. The brief is the input to the first `/grill-me` round (step 4).
 
 ## Where it lives
 

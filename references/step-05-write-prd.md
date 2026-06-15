@@ -65,7 +65,7 @@ The skill is designed to consume the current session's context — it doesn't ne
    - Citations to the right module names from the brief's module breakdown
    - Open items match the actual remaining unknowns
 2. Commit `spec/prd.md` to git locally (the repo is created in step 6 if it doesn't exist yet — for now just save the file)
-3. Generate the DOCX if you'll be sending it for team feedback in step 7:
+3. Generate the DOCX so it's ready for the client deliverable in step 12:
    ```bash
    pandoc spec/prd.md -o "/Users/brad/Documents/aaa/Client Docs/<Client Full Name>/prd/<project-slug>/<Client>-<Project>-PRD-v1.0.docx" --from markdown --to docx
    ```
@@ -74,7 +74,7 @@ The skill is designed to consume the current session's context — it doesn't ne
 ## Don't do this
 
 - **Don't paste financial info into the PRD.** Same global rule as the brief.
-- **Don't have the PRD contradict the brief.** If the brief says "scope is X" and the PRD says "scope is Y", that's a sign you skipped the version-bump in step 8 or didn't carry over a decision. Reconcile.
+- **Don't have the PRD contradict the brief.** If the brief says "scope is X" and the PRD says "scope is Y", you missed carrying over a decision from the grill session. Reconcile.
 - **Don't re-litigate decisions in the PRD.** If `/grill-me` decided something, the PRD records the decision and moves on. The PRD is not a discussion document.
 
 ## Done when

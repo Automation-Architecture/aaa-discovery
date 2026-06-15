@@ -1,4 +1,4 @@
-# Step 11 — Populate Jira board with Epics + Tasks (`board-nanny`)
+# Step 10 — Populate Jira board with Epics + Tasks (`board-nanny`)
 
 ## Goal
 
@@ -82,4 +82,4 @@ The agent uses the Atlassian MCP to create issues with the right linkages (Tasks
 
 ## Done when
 
-Board is populated, operator nods at the result. Move to step 12.
+Board is populated, operator nods at the result. Move to step 11.
