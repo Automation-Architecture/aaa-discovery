@@ -32,7 +32,7 @@ If that sub-target holds, the remaining steps comfortably fit inside 24 hours.
 
 ### How throughput is measured
 
-Each project's wall-clock = days between **`spec/project-brief.md` "Date drafted"** (step 3) and **`client-comms/email-to-<client>-discovery-handoff.md` creation date** (step 13). After step 13, append a single line to `docs/throughput-log.md` in this canonical repo:
+Each project's wall-clock = days between **`spec/project-brief.md` "Date drafted"** (step 3) and **the step 13 `#po` digest being sent**. After step 13, append a single line to `docs/throughput-log.md` in this canonical repo:
 
 ```
 <YYYY-MM-DD>  <slug>  <N business days>  <notes — what helped / what slipped>

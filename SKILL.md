@@ -14,7 +14,7 @@ Discovery is the AAA workflow that turns a sales conversation into a fully ticke
 - Enforces output-location conventions (markdown in repo, DOCX in `Client Docs/`, no financial info in tech docs)
 - Catches the order-dependent gotchas that bit the first project that ran this flow (project-key changes, version bumps, draft refreshes)
 
-The phase ends with the work fully scoped, all tickets created, the client dashboard live, all spec DOCX deliverables generated into `Client Docs/`, and a client email markdown staged for the operator to send. **Build Phase** (engineers writing code) only begins after step 13.
+The phase ends with the work fully scoped, all tickets created, the client dashboard live, all spec DOCX deliverables generated into `Client Docs/`, and a discovery digest posted to `#po`. **Build Phase** (engineers writing code) only begins after step 13.
 
 ## Throughput target
 
@@ -57,7 +57,7 @@ Each step has a dedicated reference file under `references/step-NN-<name>.md` wi
 | 10 | Populate Jira board with Epics + Tasks (`board-nanny`) | `references/step-10-board-nanny.md` | Tickets created |
 | 11 | Create client dashboard entry (`/aaa-client-init`) | `references/step-11-client-dashboard.md` | Dashboard PR merged |
 | 12 | Generate spec DOCX deliverables into `Client Docs/` | `references/step-12-spec-docx.md` | Brief, PRD, Tech Spec DOCX in `Client Docs/<Client>/` |
-| 13 | Write client email markdown with dashboard link + all spec DOCX | `references/step-13-client-email.md` | `client-comms/email-to-<client>-discovery-handoff.md` in the repo |
+| 13 | Post discovery digest to `#po` | `references/step-13-discovery-digest.md` | Slack message in `#po` with all 13 steps + artifact links |
 
 ## Progress tracking
 
@@ -94,17 +94,16 @@ These match the operator's global rules. Reread them periodically; the temptatio
 
 ## Phase boundary
 
-Discovery ends after step 13 (the operator sends the client email and any client-side responses come back). **Build Phase** then takes over with three high-level steps: Phase 1 build (supervised), burn-in period, Phase 2 launch (autonomous + any remaining channels). Do not roll Build steps into this skill — they're not part of Discovery and they're project-specific.
+Discovery ends after step 13 (the `#po` digest is sent). **Build Phase** then takes over with three high-level steps: Phase 1 build (supervised), burn-in period, Phase 2 launch (autonomous + any remaining channels). Do not roll Build steps into this skill — they're not part of Discovery and they're project-specific.
 
 ## Common pitfalls (from the first run of this flow)
 
 These are the things that went sideways on the Kidneyhood Zendesk Agent project. Heads-up so you don't repeat them.
 
-1. **Project key churn.** The operator may recreate the Jira project under a new key after step 5 (e.g., `KZA` → `KHZ`). When this happens, sweep the codebase + memory + sync workflow + DOCX + email draft for stale references. The sweep is non-trivial — keep a checklist.
-2. **DOCX path discipline.** All DOCX generation happens in **step 12**, not ad-hoc throughout the flow. Pandoc writes directly into `Client Docs/`, never into the repo. Old versioned DOCX files in `Client Docs/` are deleted on version bump, not left to accumulate. By the time you reach step 13, all DOCX deliverables are current.
-3. **Email lives in the repo, not Gmail.** Step 13 produces a markdown file under `client-comms/` in the project repo — subject options, body draft, attachment paths, and operator notes. The operator copies the body into Gmail (or any sender) and attaches the DOCX files manually. Don't create or maintain a Gmail draft as part of the skill flow. (We learned this on the first run: maintaining a Gmail draft across spec versions added churn without value, since the operator was rewriting the body anyway.)
-4. **`/grill-me` is two rounds, not one — and the second is engineer-led.** Round 1 (step 4) tests product scope and the operator drives. Round 2 (step 8) tests architecture and the **assigned engineer** drives. The operator stages a stub in `spec/GRILL_SESSION.md` (questions + recommended starting positions), commits via PR, and sends a Slack message to `#po` tagging the engineer. The engineer either runs `/grill-me` interactively from the project repo or edits the file directly via PR. Skipping round 2 — or running it without the engineer — means architecture defaults get made solo and re-litigated mid-build.
-5. **Version bumps signal substantive changes.** PRD v1.0 → v1.1 should reflect meaningful scope changes discovered during step 8 or thereafter. PRD v1.1 → v1.2 should reflect post-tech-spec corrections. Don't bump for cosmetic edits.
+1. **Project key churn.** The operator may recreate the Jira project under a new key after step 5 (e.g., `KZA` → `KHZ`). When this happens, sweep the codebase + memory + sync workflow + DOCX for stale references. The sweep is non-trivial — keep a checklist.
+2. **DOCX path discipline.** All DOCX generation happens in **step 12**, not ad-hoc throughout the flow. Pandoc writes directly into `Client Docs/`, never into the repo. Old versioned DOCX files in `Client Docs/` are deleted on version bump, not left to accumulate. All DOCX deliverables are current before the step 13 digest goes out.
+3. **`/grill-me` is two rounds, not one — and the second is engineer-led.** Round 1 (step 4) tests product scope and the operator drives. Round 2 (step 8) tests architecture and the **assigned engineer** drives. The operator stages a stub in `spec/GRILL_SESSION.md` (questions + recommended starting positions), commits via PR, and sends a Slack message to `#po` tagging the engineer. The engineer either runs `/grill-me` interactively from the project repo or edits the file directly via PR. Skipping round 2 — or running it without the engineer — means architecture defaults get made solo and re-litigated mid-build.
+4. **Version bumps signal substantive changes.** PRD v1.0 → v1.1 should reflect meaningful scope changes discovered during step 8 or thereafter. PRD v1.1 → v1.2 should reflect post-tech-spec corrections. Don't bump for cosmetic edits.
 
 ## How to kick off
 

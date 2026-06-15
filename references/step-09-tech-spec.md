@@ -84,7 +84,7 @@ The agent will follow its own template, but a complete tech spec normally includ
    - **No reintroduced scope** the PRD declared out
    - **Concrete versions** (e.g., "Python 3.12", "Postgres 16", "Pinecone serverless tier") — not "TBD"
 2. Commit and push to the project repo
-3. Generate the DOCX into `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` — the client may want to see this too (step 13's email includes it)
+3. Generate the DOCX into `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` — referenced in the step 13 discovery digest
 
 ## Don't do this
 
