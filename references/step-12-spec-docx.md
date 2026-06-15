@@ -1,8 +1,8 @@
-# Step 14 — Generate spec DOCX deliverables into Client Docs
+# Step 12 — Generate spec DOCX deliverables into Client Docs
 
 ## Goal
 
-Every spec markdown source is rendered to a polished DOCX in `Client Docs/<Client Full Business Name>/`. This is the step that produces the deliverables the operator attaches to the client email (step 15). By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources — not stale from earlier in the flow when the brief or PRD got version-bumped after team feedback.
+Every spec markdown source is rendered to a polished DOCX in `Client Docs/<Client Full Business Name>/`. This is the step that produces the deliverables the operator attaches to the client email (step 13). By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
 
 This step also enforces the global rule that DOCX deliverables live **only** in `Client Docs/<Client>/`, never in the repo.
 
@@ -95,4 +95,4 @@ rm "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>
 - No prior-version DOCX still sitting in Client Docs
 - All three files open cleanly in Word/Pages without rendering errors
 
-Move to step 15 (client email) — that step references these DOCX paths directly.
+Move to step 13 (client email) — that step references these DOCX paths directly.

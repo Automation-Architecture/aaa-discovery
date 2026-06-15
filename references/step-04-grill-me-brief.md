@@ -16,7 +16,7 @@ The skill will run as an interactive interview. Don't try to script it — let `
 
 ## What to ask `/grill-me` to focus on (product-layer)
 
-Hand it the brief and ask it to focus on **product / user-experience / scope** decisions. Don't let it drift into architecture (that's step 9). Examples of product-layer questions it should be asking:
+Hand it the brief and ask it to focus on **product / user-experience / scope** decisions. Don't let it drift into architecture (that's step 8). Examples of product-layer questions it should be asking:
 
 - Autonomy posture (supervised? autonomous? hybrid? graduation criteria?)
 - Confidence model (how does the system decide when to act?)
@@ -39,7 +39,7 @@ Hand it the brief and ask it to focus on **product / user-experience / scope** d
 ## Don't do this
 
 - **Don't run `/grill-me` and then ignore its output.** The decisions it surfaces are the substrate for the PRD. Skipping them and writing a generic PRD wastes the round.
-- **Don't let it drift into architecture.** Queue mechanism, vector DB choice, DB tooling — those are step 9. If `/grill-me` starts asking those, redirect it to product-layer questions.
+- **Don't let it drift into architecture.** Queue mechanism, vector DB choice, DB tooling — those are step 8. If `/grill-me` starts asking those, redirect it to product-layer questions.
 - **Don't try to "win" against the operator's choices.** When the operator picks a non-recommended option, document the choice and the reasoning. They know things you don't (client preferences, business constraints, prior context).
 
 ## Done when

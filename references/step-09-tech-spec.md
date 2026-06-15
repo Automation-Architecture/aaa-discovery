@@ -1,4 +1,4 @@
-# Step 10 — Write the tech spec
+# Step 9 — Write the tech spec
 
 ## Goal
 
@@ -54,7 +54,7 @@ The agent will follow its own template, but a complete tech spec normally includ
   - For the main flows: end-to-end with all actors
 
 ## Concrete Tech Choices
-  - Final picks (locked by step 9): runtime versions, library versions, service tiers
+  - Final picks (locked by step 8): runtime versions, library versions, service tiers
 
 ## Deployment
   - Infra-as-code or stepwise commands
@@ -88,7 +88,7 @@ The agent will follow its own template, but a complete tech spec normally includ
 
 ## Don't do this
 
-- **Don't let the tech spec contradict the PRD.** They're co-authored documents. If the tech spec needs to deviate, update the PRD too (and consider whether you need to re-run step 9).
+- **Don't let the tech spec contradict the PRD.** They're co-authored documents. If the tech spec needs to deviate, update the PRD too (and consider whether you need to re-run step 8).
 - **Don't put implementation details in the brief or PRD.** Specific versions, library choices, service tiers go here, not in the upstream docs.
 
 ## Verify before moving on
@@ -100,4 +100,4 @@ The agent will follow its own template, but a complete tech spec normally includ
 
 ## Done when
 
-Tech spec is written and committed. Move to step 11.
+Tech spec is written and committed. Move to step 10.

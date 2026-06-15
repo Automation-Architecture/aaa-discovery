@@ -1,4 +1,4 @@
-# Step 15 — Write client email markdown with dashboard link and all spec docs
+# Step 13 — Write client email markdown with dashboard link and all spec docs
 
 ## Goal
 

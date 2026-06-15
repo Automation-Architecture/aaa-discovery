@@ -2,7 +2,7 @@
 
 ## Goal
 
-A blank Jira project for the client engagement. The board stays empty until step 11 (`board-nanny` populates it from the tech spec) — but the project key needs to exist now because the dashboard sync workflow (step 12) and any prior automation refers to it.
+A blank Jira project for the client engagement. The board stays empty until step 10 (`board-nanny` populates it from the tech spec) — but the project key needs to exist now because the dashboard sync workflow (step 11) and any prior automation refers to it.
 
 ## How to do it
 
