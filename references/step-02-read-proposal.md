@@ -6,11 +6,25 @@ Internalize the formal scope, deliverables, and stakeholders the client has *sig
 
 ## Where the proposal lives
 
-`~/Documents/aaa/Client Docs/<Client Full Business Name>/proposal/`
+Proposals are stored in the **Onboarding Shared Drive** on Google Drive:
 
-Typical file: `<Business Name>_Proposal_<Engineer>.pdf` (or `.docx`). There may also be an SOW separately.
+- **Shared Drive:** [Onboarding](https://drive.google.com/drive/folders/0AOk2FIY4h-9gUk9PVA)
+- **Drive ID:** `0AOk2FIY4h-9gUk9PVA`
+- **Expected path inside the drive:** `<Client Full Business Name>/proposal/`
 
-If the proposal isn't there, **stop and ask the operator** — Discovery should not proceed without one. The proposal is what got the client to sign and is non-negotiable as a Discovery input.
+Use the Google Drive MCP (`mcp__claude_ai_Google_Drive__search_files`) to locate the file:
+
+```
+query: "title contains 'Proposal' and parentId = '<client-folder-id>'"
+```
+
+Or browse directly via the Drive URL above. Typical filename: `<Business Name>_Proposal_<Engineer>.pdf` (or `.docx`). There may also be a signed SOW separately.
+
+To read the file once located, use `mcp__claude_ai_Google_Drive__read_file_content` with the file ID returned by the search.
+
+If the proposal isn't in the Onboarding Shared Drive, **stop and ask the operator** — Discovery should not proceed without one. The proposal is what got the client to sign and is non-negotiable as a Discovery input.
+
+> **Migrated 2026-06-15:** Proposals moved from `~/Documents/aaa/Client Docs/<Client Full Business Name>/proposal/` to the Onboarding Shared Drive. The local path no longer contains the source document for any engagement.
 
 ## What to extract
 
@@ -24,13 +38,13 @@ If the proposal isn't there, **stop and ask the operator** — Discovery should 
 
 ## What NOT to extract into tech docs
 
-The proposal contains financial information (pricing, payment terms, invoicing schedule). **Do not surface any of this in the brief, PRD, tech spec, README, Jira, or any other tech artifact.** Per the operator's global rule: tech docs stay technical. Financial content stays in `Client Docs/<Client>/proposal/` and the sales conversation only.
+The proposal contains financial information (pricing, payment terms, invoicing schedule). **Do not surface any of this in the brief, PRD, tech spec, README, Jira, or any other tech artifact.** Per the operator's global rule: tech docs stay technical. Financial content stays in the proposal (on the Onboarding Shared Drive) and the sales conversation only — it never crosses into any technical document.
 
 When you read the proposal in this step, *use* the budget/timeline information to inform your understanding of constraints, but never copy it into a tech doc. The "Timeline" you write in the brief should be in calendar terms (e.g., "2–3 week build window") not in invoicing terms.
 
 ## How to read it
 
-PDFs are the most common format. Use the `Read` tool on the PDF directly — Claude Code can read PDFs natively and will summarize the structured content. If you need to extract specific tables (e.g., a milestones list), the agent's PDF reader handles tables reasonably well.
+PDFs are the most common format. Use `mcp__claude_ai_Google_Drive__read_file_content` with the file ID to retrieve the content — load the tool schema first via `ToolSearch("select:mcp__claude_ai_Google_Drive__read_file_content")`. If you need to extract specific tables (e.g., a milestones list), the Drive MCP returns plain text that Claude can parse directly.
 
 If you find ambiguity between the proposal and the sales call transcripts (e.g., transcript says "we'll do X" but proposal omits X, or vice versa), surface this immediately to the operator. Don't paper over it. The operator decides whether the brief tracks the proposal or the latest verbal agreement.
 

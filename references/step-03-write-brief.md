@@ -1,4 +1,4 @@
-# Step 2 — Write the project brief
+# Step 3 — Write the project brief
 
 ## Goal
 
@@ -104,8 +104,9 @@ Reference the canonical 13-step sequence. Mark steps complete as we move through
 
 | # | Step | Status |
 |---|------|--------|
-| 1 | Read sales call transcripts | ✅ Done |
-| 2 | Write project brief | 🔄 In progress |
+| 1 | Find and read the sales call transcript | ✅ Done |
+| 2 | Read the signed proposal | ✅ Done |
+| 3 | Write project brief | 🔄 In progress |
 | ... | ... | ... |
 
 ## Build Phase
@@ -115,7 +116,7 @@ The three-step build (Phase 1 supervised, burn-in, Phase 2 launch).
 
 ## Don't do this
 
-- **Do not include financial information.** No budget numbers, no pricing, no payment status, no proposal terms. That's a global rule. Tech docs are technical. Financial content belongs in `Client Docs/<Client>/proposal/`. Repeat: do not put a Budget line in the brief.
+- **Do not include financial information.** No budget numbers, no pricing, no payment status, no proposal terms. That's a global rule. Tech docs are technical. Financial content belongs in the proposal on the Onboarding Shared Drive and the sales conversation only. Repeat: do not put a Budget line in the brief.
 - **Do not pre-bake "open questions" you can answer.** The brief should already reflect what the operator and you know. Genuine open items go in the dedicated section; don't pad it.
 - **Do not duplicate the PRD.** The brief is the 10-minute version. The PRD is the 30-minute version. If you find yourself listing 39 user stories in the brief, stop and move them to the PRD.
 

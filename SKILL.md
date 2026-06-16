@@ -1,6 +1,6 @@
 ---
 name: aaa-discovery
-description: Walks the operator through the Automation Architecture (AAA) Discovery Phase for a new client engagement — a 15-step sequence that produces a fully scoped, ticketed, and client-informed project before any engineer writes code. Trigger this skill whenever a new client project is starting, when the operator says "kick off discovery", "start a new client", "new client engagement", "spin up a new project", "let's begin discovery", or invokes `/aaa-discovery`. Also trigger when a sales call transcript has just been read and the next step is to start scoping the work, or when the operator references "the 15 steps", "the AAA discovery flow", or "the canonical sequence". This skill orchestrates other skills (grill-me, to-prd, aaa-client-init) and agents (cto-technical-architect, board-nanny) — invoke it as the entry point so the steps run in the right order, with the right artifacts, in the right places.
+description: Walks the operator through the Automation Architecture (AAA) Discovery Phase for a new client engagement — a 13-step sequence that produces a fully scoped, ticketed, and client-informed project before any engineer writes code. Trigger this skill whenever a new client project is starting, when the operator says "kick off discovery", "start a new client", "new client engagement", "spin up a new project", "let's begin discovery", or invokes `/aaa-discovery`. Also trigger when a sales call transcript has just been read and the next step is to start scoping the work, or when the operator references "the 13 steps", "the AAA discovery flow", or "the canonical sequence". This skill orchestrates other skills (grill-me, to-prd, aaa-client-init) and agents (cto-technical-architect, board-nanny) — invoke it as the entry point so the steps run in the right order, with the right artifacts, in the right places.
 ---
 
 # AAA Discovery Phase
@@ -9,7 +9,7 @@ description: Walks the operator through the Automation Architecture (AAA) Discov
 
 Discovery is the AAA workflow that turns a sales conversation into a fully ticketed, client-informed project ready for engineers to build against. It is **13 sequential steps**, run end-to-end, before any code is written. The skill:
 
-- Tracks progress through the 15 steps using the operator's task list
+- Tracks progress through the 13 steps using the operator's task list
 - Hands off to other skills (`/grill-me`, `/to-prd`, `/aaa-client-init`) and agents (`cto-technical-architect`, `board-nanny`) at the right moments
 - Enforces output-location conventions (markdown in repo, DOCX in `Client Docs/`, no financial info in tech docs)
 - Catches the order-dependent gotchas that bit the first project that ran this flow (project-key changes, version bumps, draft refreshes)
@@ -68,18 +68,19 @@ Add the 13 steps to the task list at kickoff so the operator can see where they 
 These match the operator's global rules. Reread them periodically; the temptation to drop files in the wrong place is real.
 
 - **Markdown source of truth** lives in the project's repo at `~/Documents/aaa/client_projects/<initials>/repo/<project>/spec/`. Examples: `spec/project-brief.md`, `spec/prd.md`, `spec/tech-spec.md`.
-- **Pre-Discovery artifacts** (sales call transcripts, signed proposal) live in `~/Documents/aaa/Client Docs/<Client Full Business Name>/` — `Meeting Transcripts/` and `proposal/` subdirectories. Read them in steps 1 and 2.
+- **Pre-Discovery artifacts — transcripts** (sales call recordings) live in `~/Documents/aaa/Client Docs/<Client Full Business Name>/Meeting Transcripts/`. Read them in step 1.
+- **Pre-Discovery artifacts — signed proposal** lives in the **Onboarding Shared Drive** on Google Drive (Drive ID: `0AOk2FIY4h-9gUk9PVA`), under `<Client Full Business Name>/proposal/`. Read via the Google Drive MCP in step 2.
 - **DOCX deliverables** are generated via pandoc directly into `~/Documents/aaa/Client Docs/<Client Full Business Name>/<area>/`. Never generate a DOCX into the repo first and then copy. If you find a DOCX in the repo, `git rm` it.
 - **Memory** for the project lives at `~/.claude/projects/-Users-brad-Documents-aaa-client-projects-<initials>-repo-<project>/memory/`.
 - **No financial information in any technical doc** — no budget, no pricing, no payment status, no proposal terms. That belongs in `Client Docs/<Client>/proposal/` and the sales conversation only. If you find financial info in a tech doc, remove it.
 - **GitHub repos** go under the `Automation-Architecture` org, never personal accounts.
 
-## Tools and skills used across the 15 steps
+## Tools and skills used across the 13 steps
 
 | Tool / skill / agent | Steps where used |
 |----------------------|------------------|
 | Fireflies MCP, Granola MCP, file reads | 1 |
-| `Read` tool on PDF/DOCX in `Client Docs/<Client>/proposal/` | 2 |
+| Google Drive MCP (`mcp__claude_ai_Google_Drive__search_files` + `read_file_content`) | 2 |
 | Markdown drafting | 3, 5, 9, 11 |
 | `/grill-me` skill | 4, 10 |
 | `/to-prd` skill | 5 |
