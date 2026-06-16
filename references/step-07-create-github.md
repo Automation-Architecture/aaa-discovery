@@ -1,4 +1,4 @@
-# Step 6 — Create GitHub repo with README (and resources)
+# Step 7 — Create GitHub repo with README (and resources)
 
 ## Goal
 
@@ -47,7 +47,7 @@ gh repo create Automation-Architecture/<slug> \
 ## Docs
 
 - [`spec/project-brief.md`](spec/project-brief.md) — project scope, goals, success metrics
-- [`spec/prd.md`](spec/prd.md) — product requirements (user stories, modules, testing)
+- [`spec/prd.md`](spec/prd.md) — product requirements (overview, objectives, modules, epics)
 - [`spec/tech-spec.md`](spec/tech-spec.md) — technical specification (added in step 9)
 
 ## Status
@@ -123,4 +123,4 @@ Save each API area as a separate `resources/<vendor>-<area>.md` with a comment a
 
 ## Done when
 
-Repo is created, pushed, and the URL is shareable. Move to step 7.
+Repo is created, pushed, and the URL is shareable. Move to step 8.

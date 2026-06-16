@@ -1,4 +1,4 @@
-# Step 5 — Create Jira space + empty board
+# Step 6 — Create Jira space + empty board
 
 ## Goal
 
@@ -29,15 +29,14 @@ Once the project exists, save these values for downstream use:
 - **Board URL** (full URL the operator shared)
 
 Add the project key to:
-- The brief's deliverables sequence row for step 5 (status → ✅ Done with the key + board number)
-- The PRD's "Sequencing / phased build" section if relevant
+- The brief's deliverables sequence row for step 6 (status → ✅ Done with the key + board number)
 - Memory for the project so future sessions can find it
 
 ## Don't do this
 
 - **Don't pick the project key without operator approval.** They may have a preferred convention or may need to align with a parent client project.
-- **Don't try to populate the board now.** Step 11 does that, after the tech spec is written.
-- **Don't assume the key the operator suggested initially is the final key.** On the first run of this flow, the operator changed `KZA` to `KHZ` after step 5 was already done. If the key changes after this step, sweep all references (memory, dashboard sync workflow, PRD/brief Pinecone index names if applicable, email draft attachments, etc.).
+- **Don't try to populate the board now.** Step 10 does that, after the tech spec is written.
+- **Don't assume the key the operator suggested initially is the final key.** On the first run of this flow, the operator changed `KZA` to `KHZ` after step 6 was already done. If the key changes after this step, sweep all references (memory, dashboard sync workflow, PRD/brief Pinecone index names if applicable, email draft attachments, etc.).
 
 ## Verify before moving on
 
@@ -47,4 +46,4 @@ Add the project key to:
 
 ## Done when
 
-Jira project + board exist, key + URL recorded, brief updated. Move to step 6.
+Jira project + board exist, key + URL recorded, brief updated. Move to step 7.

@@ -95,6 +95,12 @@ something useful. If a feature is invisible to the user or only serves
 a technical purpose, it is not an Epic here — it belongs in the tech
 spec as an implementation concern.
 
+> **Epic shape standard:** Before writing Epics, read
+> `aaa-SOP/discovery-sop.md §2 — Epic Scope Standard`. The SOP defines
+> what makes a valid feature epic, the named exceptions (enabler epics,
+> compliance/external-gate epics), and the ratio check. Epics that don't
+> meet the standard must be restructured before the PRD is committed.
+
 Epics should map to the modules above — an Epic typically combines one
 or more modules into a user-facing workflow.
 
