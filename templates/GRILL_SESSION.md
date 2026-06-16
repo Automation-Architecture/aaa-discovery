@@ -7,7 +7,7 @@
 
 ## How to read this document
 
-This file captures every architecture- and product-layer **decision** that came out of the two `/grill-me` rounds during Discovery. Each question has three parts:
+This file captures every product- and architecture-layer **decision** that came out of the two grill rounds during Discovery. Each question has three parts:
 
 - **The question** — the open branch the round resolved
 - **Recommended starting position** (or "Recommended answer" in Round 1) — what was proposed before the round started, with brief rationale
@@ -21,7 +21,7 @@ Three valid forms for each `Decision.` line:
 
 Don't leave a `Decision.` line as `_TBD_` once the round is in progress. If you genuinely can't pick (need a spike, blocked on client input), record that as the decision: `**Decision.** Spike required — <ticket #>`.
 
-Once both rounds are locked (no more `_TBD_`), the tech spec (step 9) is mostly transcription, not invention.
+Once both rounds are locked (no more `_TBD_`), the tech spec (step 8) is mostly transcription, not invention.
 
 ---
 
@@ -92,7 +92,7 @@ _<...>_
   relational DB, deploy target, eval platform, observability, queue, webhook auth,
   compliance, channels & SLAs, cost controls, prompt management, failure modes,
   test layers, module breakdown, CI shape, secret management, local dev, DB
-  migrations) is documented in references/step-08-grill-me-arch.md — pick the
+  migrations) is documented in references/step-07-grill-me-arch.md — pick the
   ones the PRD doesn't already lock.
 -->
 
@@ -111,6 +111,6 @@ _<how the architecture decisions feed the tech spec. Confirm what's locked. Flag
 
 - [ ] **Round 1 complete** — all Decisions filled, operator confirms
 - [ ] **Round 2 complete** — all Decisions filled, engineer confirms
-- [ ] **Tech spec drafted** (step 9) — `spec/tech-spec.md` exists
+- [ ] **Tech spec drafted** (step 8) — `spec/tech-spec.md` exists
 
-When all three are checked, Discovery moves to step 10 (board population via `board-nanny`).
+When all three are checked, Discovery moves to step 10 (tasks via `board-nanny` Phase 2).

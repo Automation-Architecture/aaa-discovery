@@ -190,6 +190,6 @@ _If the tech-spec process surfaced contradictions between the brief, PRD, propos
 - [ ] Every Round 2 decision in `GRILL_SESSION.md` is reflected somewhere in this doc
 - [ ] No financial info anywhere (no pricing, deposits, payment status, contract terms)
 - [ ] Assigned engineer has read end-to-end and signed off
-- [ ] DOCX generated to `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx` (happens in step 12, not here)
+- [ ] DOCX generated inline at this step (`pandoc` → `/tmp/` → Onboarding Shared Drive → `<Client Full Business Name>/deliverables/`) and verified again at step 12
 
-When all six are checked, Discovery moves to step 10 (board population via `board-nanny`).
+When all six are checked, Discovery moves to step 10 (tasks via `board-nanny` Phase 2).

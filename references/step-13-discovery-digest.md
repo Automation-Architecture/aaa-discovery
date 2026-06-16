@@ -27,7 +27,7 @@ All 13 steps with completion markers:
 ✅ 4 — Product grill session
 ✅ 5 — PRD
 ✅ 6 — Jira board created (<JIRA-KEY>)
-✅ 7 — Architecture grill stub → <@engineer-userid>
+✅ 7 — Architecture grill complete (engineer: <@engineer-userid>)
 ✅ 8 — Tech spec
 ✅ 9 — Discovery eval passed
 ✅ 10 — Board populated (N epics, M tasks)
