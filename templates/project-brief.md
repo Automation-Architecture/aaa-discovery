@@ -1,59 +1,132 @@
-# Project Brief — _<Project Name>_
+# Project Brief: <Client Project Name>
 
-> **Stage:** Step 2 of the discovery workflow. This is the **first-pass structured summary** built from the available inputs (transcripts, proposal, emails). It is the input to the grilling round, not the final discovery output.
+**Client:** <First name> / <Business name>
+**Website:** <client domain>
+**Date:** <YYYY-MM-DD> (v1.0)
+**Prepared by:** Automation Architecture AI
 
 ---
 
-## Client / project
+## Problem Statement
 
-- **Client:** _<Full business name>_
-- **Project codename:** _<short identifier>_
-- **Date drafted:** _<YYYY-MM-DD>_
+What's broken / underused / under-leveraged today, in plain language. 2–4 paragraphs.
 
-## Problem statement
+---
 
-_One paragraph. What is the client trying to solve? What does the world look like today, and what does "fixed" look like?_
+## Solution Overview
 
-## Audience / users
+What we're building. 4–8 bullets describing the system's character (autonomous, supervised-then-autonomous, integrated-into-X, closed/proprietary, etc.). Don't go into architecture — that's for the tech spec.
 
-_Who actually uses this? Roles, volumes, and what they do with it._
+---
+
+## Goals
+
+Numbered list, 4–6 items. Each is a measurable outcome the system should achieve.
+
+---
+
+## Knowledge Sources
+
+If the project has a knowledge base / RAG / data ingestion component, list every source: format, how it's treated (indexed vs few-shot vs eval-only), explicitly-rejected sources.
+
+---
+
+## Agent / System Behavior
+
+ASCII flowchart of the main happy-path flow + edge cases. Annotate with notes on key decisions.
+
+---
+
+## Success Metrics
+
+Table: metric, target, measurement method. ≥ 5 metrics.
+
+| Metric | Target | Measurement method |
+|--------|--------|--------------------|
+| <metric> | <target> | <how to measure> |
+
+---
 
 ## Scope
 
-**In scope:**
-- _<bullet>_
-- _<bullet>_
+Phased if applicable (e.g., burn-in then autonomous). Each phase lists what's in scope.
 
-**Out of scope (or deferred):**
-- _<bullet>_
+### Out of Scope (v1)
 
-## Constraints
+Bulleted list. Be exhaustive — it's cheaper to declare something out-of-scope here than to litigate it mid-build.
 
-_Technical, regulatory, timeline, integration. **Do not include pricing, budget, or commercial terms.**_
+---
 
-- _<bullet>_
+## Stakeholders
 
-## Knowns
+Table: name, role.
 
-_What we have direct evidence for from the transcripts, proposal, or prior conversation._
+| Name | Role |
+|------|------|
+| <name> | <role> |
 
-- _<fact> — source: <transcript / proposal / email>_
+---
 
-## Unknowns
+## High-Level Architecture
 
-_Things the inputs do not answer. **These become the grilling agenda.**_
+Table: layer, choice, notes. One line per architectural concern (backend, LLM, vector DB, relational DB, deploy, eval, observability, auth, etc.). Final picks are in the tech spec; this is a sketch.
 
-- _<question>_
-- _<question>_
+| Layer | Choice (tentative) | Notes |
+|-------|--------------------|-------|
+| Backend | | |
+| LLM | | |
+| Deploy | | |
 
-## Source artifacts
+### Module Breakdown
 
-_Pointers to the raw inputs the brief was built from._
+Numbered list of modules with one-line descriptions. Use deep modules: each encapsulates a significant chunk of functionality behind a simple, stable interface.
 
-- Transcript: _<path or URL>_
-- Proposal: _<path>_
-- Email thread: _<reference>_
+1. **<Module name>** — <one sentence: what it owns end-to-end>
 
-## Next step
+---
 
-Hand this brief to the operator and run `grill-me` on every Unknown until each branch resolves. Capture outcomes in `discovery-notes.md`.
+## Risks
+
+Table: risk, mitigation. Include both operator-facing risks (timeline, scope, compliance, external dependencies) and architecture risks (hallucination, latency, cost, third-party APIs).
+
+| Risk | Mitigation |
+|------|------------|
+| <risk> | <mitigation> |
+
+---
+
+## Open Items Pending Client Input
+
+Numbered list of things the client needs to confirm or provide before or during the build (source files, approval capacity, system access, compliance sign-offs, etc.).
+
+---
+
+## Compliance and External Gates
+
+List any regulatory, compliance, or integration constraints that require external action before build can begin. Examples: HIPAA BAA with vendors, PCI scope confirmation, EHR sandbox access, OAuth app approval. Flag estimated lead times.
+
+| Constraint | External action required | Estimated lead time |
+|------------|--------------------------|---------------------|
+| <e.g., HIPAA BAA with Twilio> | <vendor agreement> | <~1 week> |
+
+---
+
+## Discovery Phase
+
+Reference the canonical 13-step sequence. Mark steps complete as we move through them.
+
+| # | Step | Status |
+|---|------|--------|
+| 1 | Find and read the sales call transcript | ✅ Done |
+| 2 | Read the signed proposal | ✅ Done |
+| 3 | Write project brief | 🔄 In progress |
+| 4 | Autonomous product scope grill | ⬜ |
+| 5 | Write PRD | ⬜ |
+| 6 | Create Jira board + epics | ⬜ |
+| 7 | Architecture grill (engineer-led) | ⬜ |
+| 8 | Write tech spec | ⬜ |
+| 9 | Discovery eval (quality gate) | ⬜ |
+| 10 | Populate Jira tasks | ⬜ |
+| 11 | Client dashboard | ⬜ |
+| 12 | Verify DOCX deliverables in Drive | ⬜ |
+| 13 | Discovery digest to #po | ⬜ |

@@ -7,7 +7,7 @@ description: Walks the operator through the Automation Architecture (AAA) Discov
 
 ## What this skill does
 
-Discovery is the AAA workflow that turns a sales conversation into a fully ticketed, client-informed project ready for engineers to build against. It is **12 sequential steps**, run end-to-end, before any code is written. The skill:
+Discovery is the AAA workflow that turns a sales conversation into a fully ticketed, client-informed project ready for engineers to build against. It is **13 sequential steps**, run end-to-end, before any code is written. The skill:
 
 - Tracks progress through the 13 steps using the operator's task list
 - Hands off to other skills (`/grill-me`, `/to-prd`, `/aaa-client-init`) and agents (`cto-technical-architect`, `board-nanny`) at the right moments
@@ -49,7 +49,7 @@ Gather these before starting Step 1. Many will be visible in the sales call tran
 
 If anything is unclear, ask before starting. Don't infer slugs or short names — they end up baked into URLs, Jira keys, and dashboard routes.
 
-## The 12 steps
+## The 13 steps
 
 Each step has a dedicated reference file under `references/step-NN-<name>.md` with the full playbook. SKILL.md gives the overview and delegation points; the reference files have the commands, the file paths, the gotchas, and the verification checks.
 
@@ -57,16 +57,17 @@ Each step has a dedicated reference file under `references/step-NN-<name>.md` wi
 |---|------|-----------|--------|
 | 1 | Read sales call meeting transcripts | `references/step-01-read-transcripts.md` | Internal context, no artifact |
 | 2 | Read the signed proposal (formal scope + deliverables) | `references/step-02-read-proposal.md` | Internal context, no artifact |
-| 3 | Write the project brief | `references/step-03-write-brief.md` | `spec/project-brief.md` (v1.0) |
-| 4 | `/grill-me` on the project brief | `references/step-04-grill-me-brief.md` | Locked-in product decisions |
-| 5 | Write the PRD via `/to-prd` | `references/step-05-write-prd.md` | `spec/prd.md` (v1.0) |
-| 6 | Create Jira space + empty board | `references/step-06-create-jira.md` | Jira project + board |
-| 7 | Notify engineer via `#po` and stage architecture grill stub (**engineer-led**) | `references/step-07-grill-me-arch.md` | Slack message sent to `#po`; `spec/GRILL_SESSION.md` Round 2 stub committed |
-| 8 | Write tech spec | `references/step-08-tech-spec.md` | `spec/tech-spec.md` |
-| 9 | Populate Jira board with Epics + Tasks (`board-nanny`) | `references/step-09-board-nanny.md` | Tickets created |
-| 10 | Create client dashboard entry (`/aaa-client-init`) | `references/step-10-client-dashboard.md` | Dashboard PR merged |
-| 11 | Generate spec DOCX deliverables and upload to Drive | `references/step-11-spec-docx.md` | Brief, PRD, Tech Spec DOCX in Onboarding Shared Drive `<Client>/deliverables/` |
-| 12 | Post discovery digest to `#po` | `references/step-12-discovery-digest.md` | Slack message in `#po` with all 12 steps + artifact links |
+| 3 | Write the project brief | `references/step-03-write-brief.md` | `spec/project-brief.md` (v1.0) + DOCX uploaded to Drive |
+| 4 | Autonomous product scope grill (two-agent) | `references/step-04-grill-me-brief.md` | `spec/GRILL_SESSION.md` Round 1 complete |
+| 5 | Write the PRD via `/to-prd` | `references/step-05-write-prd.md` | `spec/prd.md` (v1.0) + DOCX uploaded to Drive |
+| 6 | Create Jira board + epics (`board-nanny` Phase 1) | `references/step-06-create-jira.md` | Jira project, epics created and assigned |
+| 7 | Architecture grill (engineer-led) and Jira epic updates | `references/step-07-grill-me-arch.md` | Slack sent to `#po`; `spec/GRILL_SESSION.md` Round 2 stub committed; Jira epics updated |
+| 8 | Write tech spec | `references/step-08-tech-spec.md` | `spec/tech-spec.md` + DOCX uploaded to Drive |
+| 9 | Discovery document evaluation (quality gate) | `references/step-09-discovery-eval.md` | Scorecard (all PASS or WARNs acknowledged) |
+| 10 | Populate Jira board with tasks (`board-nanny` Phase 2) | `references/step-10-board-nanny.md` | Tasks created under existing epics |
+| 11 | Create client dashboard entry (`/aaa-client-init`) | `references/step-11-client-dashboard.md` | Dashboard live at `dashboard.automationarchitecture.ai/client/<slug>` |
+| 12 | Verify spec DOCX deliverables in Drive | `references/step-12-spec-docx.md` | All three DOCXs confirmed in Onboarding Shared Drive |
+| 13 | Post discovery digest to `#po` | `references/step-13-discovery-digest.md` | Slack message in `#po` with all 13 steps + artifact links |
 
 ## Progress tracking
 
@@ -89,17 +90,17 @@ These match the operator's global rules. Reread them periodically; the temptatio
 | Tool / skill / agent | Steps where used |
 |----------------------|------------------|
 | Fireflies MCP, Granola MCP | 1 |
-| Google Drive MCP (`search_files`, `read_file_content`, `create_file`) | 2, 11 |
-| Markdown drafting | 3, 5, 8, 10 |
-| `/grill-me` skill | 4 |
+| Google Drive MCP (`search_files`, `read_file_content`) | 2 |
+| Markdown drafting | 3, 5, 8 |
+| `pandoc` + Google Drive MCP (`create_file`) | 3, 5, 8, 12 |
+| Two-agent grill (autonomous Opinion Agent + Orchestrator) | 4 |
 | `/to-prd` skill | 5 |
-| Atlassian MCP (Jira) | 6, 9 |
-| Slack MCP | 7 (notify engineer via `#po`) |
+| Atlassian MCP (Jira) | 6, 7 (Phase C), 10 |
+| `board-nanny` agent | 6, 10 |
+| Slack MCP | 6, 7, 13 |
 | `cto-technical-architect` agent | 8 |
-| `board-nanny` agent | 9 |
-| `/aaa-client-init` skill | 10 |
-| `pandoc` + Google Drive MCP | 11 |
-| Slack MCP (digest) | 12 |
+| Eval agent | 9 |
+| `/aaa-client-init` skill | 11 |
 
 ## Phase boundary
 
@@ -111,7 +112,7 @@ These are the things that went sideways on the Kidneyhood Zendesk Agent project.
 
 1. **Project key churn.** The operator may recreate the Jira project under a new key after step 6 (e.g., `KZA` → `KHZ`). When this happens, sweep the codebase + memory + sync workflow + DOCX for stale references. The sweep is non-trivial — keep a checklist.
 2. **DOCX path discipline.** Each document's DOCX is generated inline — brief at step 3, PRD at step 5, tech spec at step 8 — and uploaded to Drive immediately. Step 12 verifies all three are present before the digest. Pandoc writes to `/tmp/` and the Drive MCP uploads to the Onboarding Shared Drive. Never put a DOCX in the repo. All DOCX deliverables are current before the step 13 digest goes out.
-3. **`/grill-me` is two rounds, not one — and the second is engineer-led.** Round 1 (step 4) tests product scope. Round 2 (step 7) tests architecture and the **assigned engineer** drives. The operator stages a stub in `spec/GRILL_SESSION.md`, commits via PR, and sends a Slack message to `#po` tagging the engineer. Skipping round 2 — or running it without the engineer — means architecture defaults get made solo and re-litigated mid-build.
+3. **The product grill (step 4) is autonomous — the architecture grill (step 7) is engineer-led.** Step 4 runs two Claude agents in sequence to lock product decisions without operator Q&A. Step 7 requires the assigned engineer: the PO stages a question stub in `spec/GRILL_SESSION.md` (via PR), the engineer fills in decisions, and the PO updates Jira epics from the results. Skipping Round 2 — or running it without the engineer — means architecture decisions get made solo and re-litigated mid-build.
 4. **Version bumps signal substantive changes.** PRD v1.0 → v1.1 should reflect meaningful scope changes discovered during step 7 or thereafter. PRD v1.1 → v1.2 should reflect post-tech-spec corrections. Don't bump for cosmetic edits.
 
 ## How to kick off
