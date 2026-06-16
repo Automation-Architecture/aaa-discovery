@@ -2,7 +2,7 @@
 
 ## Goal
 
-A blank Jira project for the client engagement. The board stays empty until step 10 (`board-nanny` populates it from the tech spec) — but the project key needs to exist now because the dashboard sync workflow (step 11) and any prior automation refers to it.
+Create the Jira project for the client engagement and populate it with epics from the PRD. Epics are created here in step 6 from the PRD; tasks are added later in step 10 after the tech spec is written. The project key also needs to exist now because the dashboard sync workflow (step 11) references it.
 
 ## How to do it
 

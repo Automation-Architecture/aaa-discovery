@@ -30,6 +30,7 @@ Agent({
 | 4 | **Measurability** | PRD objectives are concrete and testable; tech spec has real version numbers | Any objective is aspirational ("improve efficiency") with no testable condition; any version is "TBD" or "3.x" | Objective is testable but the measurement method is implicit |
 | 5 | **Technical concreteness** | All Round 2 grill decisions reflected in tech spec; API contracts defined; data model present; no open architecture decisions | Any grill decision not reflected; "decide later" or "TBD" in the architecture section; data model absent | Minor gap in a non-critical contract (e.g., error response shape undefined) |
 | 6 | **Financial cleanliness** | No financial information in any of the three docs | Any occurrence of `$`, "budget", "pricing", "invoice", "deposit", "payment", "cost" in a financial context | — |
+| 7 | **Compliance** | For any project with PHI, PII, HIPAA, PCI, or other regulatory constraints identified in steps 1–2: vendor BAA list present in tech spec Security section; data residency confirmed; PHI/PII flow documented. Skip this dimension if no compliance constraints were identified. | Any required BAA vendor not listed; PHI enters the system without documented residency; "HIPAA TBD" or equivalent in the tech spec | Compliance scope identified but one minor vendor BAA is undocumented; data residency confirmed verbally but not written into the tech spec |
 
 ## Output format
 
@@ -46,6 +47,7 @@ The agent must produce the scorecard in this exact format:
 | Measurability | ❌ FAIL | <short finding> |
 | Technical concreteness | ✅ PASS | — |
 | Financial cleanliness | ✅ PASS | — |
+| Compliance | ✅ PASS | — |
 
 ## Required fixes before step 10
 
@@ -78,6 +80,7 @@ Go back to the relevant step:
 | Completeness / Epic quality / Measurability — PRD | Step 5 (revise `spec/prd.md` or re-run `/to-prd`, regenerate DOCX) |
 | Consistency / Technical concreteness / Measurability — tech spec | Step 8 (revise `spec/tech-spec.md`, regenerate DOCX) |
 | Financial cleanliness | Whichever file contains it — fix, regenerate DOCX |
+| Compliance | Step 3 if compliance scope was not captured in the brief (add Compliance section); step 8 if captured but not in tech spec Security section — add vendor BAA list, PHI/PII flow, and data residency to `spec/tech-spec.md`, regenerate DOCX |
 
 After fixing, re-run the eval from scratch. The eval agent reads the current files — no partial re-runs.
 
