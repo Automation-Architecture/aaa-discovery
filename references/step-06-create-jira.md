@@ -89,7 +89,7 @@ aaa-merge <PR#>
 ## Don't do this
 
 - **Don't pick the project key without operator approval.** They may have a preferred convention or may need to align with a parent client project.
-- **Don't try to populate tasks now.** Tasks come in step 9 after the tech spec is written.
+- **Don't try to populate tasks now.** Tasks come in step 10 after the tech spec is written.
 - **Don't assume the key the operator suggested initially is the final key.** If the key changes after this step, sweep all references (memory, dashboard sync workflow, DOCX filenames, email draft attachments, etc.).
 - **Don't send the Slack message before epics exist in Jira.** The engineer needs actual cards to review, not a heads-up that cards are coming.
 

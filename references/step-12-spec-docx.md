@@ -1,4 +1,4 @@
-# Step 11 — Verify spec DOCX deliverables in Drive
+# Step 12 — Verify spec DOCX deliverables in Drive
 
 ## Goal
 
@@ -70,4 +70,4 @@ Upload the new version via Drive MCP, then delete or trash the prior version. Do
 - No stale prior-version DOCX in Drive
 - No financial information in any file
 
-Move to step 12 (discovery digest) — that step links to these Drive files in the `#po` message.
+Move to step 13 (discovery digest) — that step links to these Drive files in the `#po` message.

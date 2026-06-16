@@ -4,7 +4,7 @@
 
 A focused Product Requirements Document that captures the problem, the solution, and the work broken into Epics. An **Epic** is a complete, user-facing feature the user can see and get value from — not a technical layer, not a module, not a task. If a user cannot open it, use it, and walk away with something useful, it is not an Epic.
 
-The PRD does not go into user stories, sub-tasks, API contracts, or data model detail — those belong in the tech spec (step 8) and the Jira board (step 9).
+The PRD does not go into user stories, sub-tasks, API contracts, or data model detail — those belong in the tech spec (step 8) and the Jira board (step 10).
 
 ## How to invoke
 
@@ -135,7 +135,7 @@ scope boundary — what is in and what is explicitly not in this Epic.
 
 ## Don't do this
 
-- **Don't include user stories, sub-tasks, or acceptance criteria.** Those belong in the Jira board (step 9), not the PRD.
+- **Don't include user stories, sub-tasks, or acceptance criteria.** Those belong in the Jira board (step 10), not the PRD.
 - **Don't include technical Epics** (e.g., "Database schema", "API layer", "Infrastructure setup"). If a user cannot interact with it and get value, it is not an Epic in this document — put it in the tech spec.
 - **Don't paste financial info into the PRD.** Same global rule as the brief.
 - **Don't re-litigate decisions.** If `spec/GRILL_SESSION.md` decided something, the PRD records it and moves on.

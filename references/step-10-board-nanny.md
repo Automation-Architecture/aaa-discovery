@@ -1,4 +1,4 @@
-# Step 9 — Populate Jira tasks (board-nanny Phase 2)
+# Step 10 — Populate Jira tasks (board-nanny Phase 2)
 
 ## Goal
 
@@ -84,4 +84,4 @@ The agent uses the Atlassian MCP to create issues with the right linkages (User 
 
 ## Done when
 
-Board is populated with tasks, operator has approved. Move to step 10.
+Board is populated with tasks, operator has approved. Move to step 11.
