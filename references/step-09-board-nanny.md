@@ -14,16 +14,20 @@ Use the `board-nanny` agent:
 Agent({
   description: "Board-nanny Phase 2: draft tasks for <Project>",
   subagent_type: "board-nanny",
-  prompt: "Epics are already live in Jira from step 6. Tech spec is at spec/tech-spec.md. Jira project: <KEY>, board: <NN>, cloudId: automationarchitecture.atlassian.net. Begin Phase 2 only — draft tasks (User Stories + sub-tasks) under the existing epics for operator review. Do not re-create epics. Do not write to Jira yet."
+  prompt: "Epics are already live in Jira from step 6. Tech spec is at spec/tech-spec.md. Jira project: <KEY>, board: <NN>, cloudId: automationarchitecture.atlassian.net. Before drafting, read aaa-SOP/discovery-sop.md §3 — Work Item Structure for the required hierarchy and QA sub-task rule. Begin Phase 2 only — draft tasks (User Stories + sub-tasks) under the existing epics for operator review. Do not re-create epics. Do not write to Jira yet."
 })
 ```
+
+## Work item structure standard
+
+> **Before drafting tasks, read `aaa-SOP/discovery-sop.md §3 — Work Item Structure`.** The SOP defines the required three-level hierarchy (Epic → User Story → Sub-tasks), the QA sub-task rule, and where Acceptance Criteria live. Tasks that don't meet the standard must be corrected before the draft is approved.
 
 ## Phase 2 — Tasks
 
 The agent will:
 
-1. Read the tech spec and the existing epic list from Jira
-2. Break each epic into User Stories and sub-tasks using the three-level hierarchy from `aaa-SOP/discovery-sop.md §3`:
+1. Read `aaa-SOP/discovery-sop.md §3` first, then read the tech spec and the existing epic list from Jira
+2. Break each epic into User Stories and sub-tasks using the three-level hierarchy from §3:
 
 ```
 Epic
