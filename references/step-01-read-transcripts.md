@@ -1,14 +1,45 @@
-# Step 1 — Read sales call meeting transcripts
+# Step 1 — Find and read the sales call transcript
 
 ## Goal
 
 Build internal context before drafting the brief. The sales call (and any follow-up calls) is where the client's vision, pain, constraints, budget hint, and timeline expectations were verbalized. Reading the transcript carefully is the cheapest way to avoid asking the client questions they already answered.
 
-## Where transcripts live
+## How to find the transcript
 
-- **Fireflies** — typically the operator's primary recording tool. Use the Fireflies MCP (`mcp__claude_ai_Fireflies__fireflies_*` tools) or look for files saved at `~/Documents/aaa/client_projects/<initials>/docs/client-comms/` named like `YYYY-MM-DD-<topic>-fireflies.md` or `YYYY-MM-DD-<topic>-fireflies-v2.md` (v2 is usually the cleaner edited version).
-- **Granola** — sometimes a secondary capture. Files named `YYYY-MM-DD-<topic>-granola.md` in the same folder. Use the Granola MCP if you have specific meeting IDs.
-- **Email threads** — sometimes there's a discovery-phase email exchange. Check Gmail via `gws gmail users threads list` for `from:<client-email>` if relevant.
+You need two inputs: the **business name** and the **name of the attendee** (typically the primary client contact). Use these to search Fireflies first, then fall back to Granola.
+
+### Fireflies (primary)
+
+Use `mcp__claude_ai_Fireflies__fireflies_search` with a keyword query combining the business name and attendee name:
+
+```
+keyword:"<Business Name>" scope:all limit:10
+```
+
+Or search by participant email if known:
+```
+participants:<attendee-email> limit:10
+```
+
+Scan the results for the discovery/sales call — look for the meeting title, date, and attendees list to confirm it's the right one. Then use `mcp__claude_ai_Fireflies__fireflies_get_transcript` with the meeting ID to pull the full transcript.
+
+### Granola (fallback)
+
+Use `mcp__claude_ai_Granola__query_granola_meetings` with a natural-language query:
+
+```
+"<Business Name> discovery call with <Attendee Name>"
+```
+
+### Local files (last resort — exported recordings only)
+
+Files at `~/Documents/aaa/client_projects/<initials>/docs/client-comms/` named like `YYYY-MM-DD-<topic>-fireflies.md`. Only valid if exported from a recording — a notes file typed after the call does not count as a transcript.
+
+If no transcript is found via any of the above, **stop and ask the operator** — Discovery must not proceed on memory of a call.
+
+### Email threads
+
+Sometimes there's a discovery-phase email exchange. Check Gmail for `from:<client-email>` if relevant context is missing from the transcript.
 
 ## What to extract
 
