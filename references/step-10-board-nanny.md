@@ -2,7 +2,7 @@
 
 ## Goal
 
-Convert the tech spec into trackable work units on the empty Jira board from step 5. The `board-nanny` agent does this in two phases — Epics first (operator approves), then Tasks (operator approves). The agent does not write to Jira without explicit approval at each phase.
+Convert the tech spec into trackable work units on the empty Jira board from step 6. The `board-nanny` agent does this in two phases — Epics first (operator approves), then Tasks (operator approves). The agent does not write to Jira without explicit approval at each phase.
 
 ## How to invoke
 
@@ -20,7 +20,10 @@ Agent({
 
 The agent will:
 1. Read the tech spec
-2. Group work into 6–10 Epics (foundation, ingestion, integration X, integration Y, agent core, admin/observability, etc.)
+2. Group work into Epics
+
+> **Epic shape standard:** Epics must conform to `aaa-SOP/discovery-sop.md §2 — Epic Scope Standard`. Each Epic must be a complete, user-facing feature that includes both its frontend and backend — not a horizontal layer (e.g., not "Frontend Build", "API Layer", "Database Schema"). Read §2 before approving the Epic draft.
+
 3. Output a markdown draft for the operator to review
 4. Wait for explicit "Epics approved, proceed to tasks" before phase 2
 
@@ -38,23 +41,32 @@ SendMessage to the same agent ID:
 "Epics approved, proceed to tasks. Same project KEY/board."
 ```
 
-The agent will:
-1. Break each Epic into Tasks with:
-   - **User Story** ("As a <role>, I want <capability>, so that <outcome>")
-   - **Description** (context, scope, dependencies)
-   - **Acceptance Criteria** (testable checklist)
-2. Call out dependencies between Tasks
-3. Output another markdown draft for review
-4. Wait for approval before writing to Jira
+The agent will break each Epic into User Stories and sub-tasks using the three-level hierarchy from `aaa-SOP/discovery-sop.md §3`:
 
-## Mandatory ticket structure (from the operator's global CLAUDE.md)
+```
+Epic
+└── User Story  (intent: who, what, why + context)
+    ├── Sub-task: <implementation unit>  (frontend, backend, etc.)
+    └── Sub-task: QA  (required on every User Story — carries AC)
+```
 
-Every Jira card the agent creates **must** include all three of:
-1. User Story (As a <role>...)
-2. Description (context, scope, dependencies, decisions/options if any)
-3. Acceptance Criteria (concrete, testable checklist)
+Per §3:
+- **User Story** carries the `As a <role>, I want <capability>, so that <outcome>` statement and a Description (context, scope, dependencies). No AC on the User Story.
+- **Acceptance Criteria live exclusively on the QA sub-task** (≥3 verifiable, testable criteria). The QA sub-task must be labelled `qa-subtask`.
+- **A QA sub-task is required on every User Story** — not optional, not "add later".
 
-If the agent is short of detail to write all three for a card, it must pause and ask rather than create a stub. This is non-negotiable.
+The agent outputs a markdown draft for review, then waits for approval before writing to Jira.
+
+## Mandatory ticket content (from discovery-sop.md §3)
+
+| Level | User Story statement | Description | Acceptance Criteria |
+|---|---|---|---|
+| Epic | — | ✓ required | — |
+| User Story | ✓ required | ✓ required | — |
+| Sub-task (implementation) | — | ✓ required | — |
+| Sub-task (QA — required) | — | ✓ required | ✓ required (≥3 criteria) |
+
+If the agent is short of detail to fill any required field, it must pause and ask rather than create a stub. This is non-negotiable.
 
 ## Phase 3 — Write to Jira
 
@@ -65,19 +77,21 @@ SendMessage:
 "Tasks approved, write to Jira."
 ```
 
-The agent uses the Atlassian MCP to create issues with the right linkages (Tasks under Epics).
+The agent uses the Atlassian MCP to create issues with the right linkages (User Stories under Epics, sub-tasks under User Stories).
 
 ## Don't do this
 
 - **Don't let the agent skip the approval gates.** Phases 1 and 2 are operator-review gates by design. The first run of this skill had the agent stopped mid-phase-1 because the operator decided to pivot. The gate worked. Don't shortcut it.
 - **Don't put financial info in tickets.** Same global rule as the docs.
-- **Don't create stub tickets.** All three components (Story / Description / AC) on every card. If you can't write all three, pause.
+- **Don't create stub tickets.** All required fields on every card. If you can't write them, pause.
+- **Don't put AC on User Stories.** AC lives on the QA sub-task only.
 
 ## Verify before moving on
 
 - Jira board has the right Epic count
-- Each Epic has its child Tasks
-- Spot-check 3 Tasks: do they each have Story + Description + AC?
+- Each Epic has its child User Stories and sub-tasks
+- Spot-check 3 User Stories: each has a Story statement + Description, no AC
+- Spot-check their QA sub-tasks: each has AC with ≥3 verifiable criteria
 - Dependencies are noted in Description fields
 
 ## Done when
