@@ -11,6 +11,11 @@ The client dashboard reads from Jira (sprint data) and GitHub (activity), so ste
 - Jira board populated (step 10) so the dashboard's sync workflow has data to pull
 - GitHub repo created before discovery started (prerequisite) so the activity feed has commits
 - A `project.config.yaml` in the project repo with the slug, contact channel, and other metadata
+- `aaa-client-dashboard` repo cloned locally at `~/Documents/aaa/aaa-client-dashboard/` and on `main` (the `/aaa-client-init` skill lives there):
+
+  ```bash
+  cd ~/Documents/aaa/aaa-client-dashboard && git fetch && git checkout main && git reset --hard origin/main
+  ```
 
 ## Create `project.config.yaml`
 
@@ -68,6 +73,13 @@ The skill (which lives in `aaa-client-dashboard/.claude/skills/aaa-client-init/`
    gh workflow run "Sync Jira Data" --repo Automation-Architecture/aaa-client-dashboard --ref main
    ```
 6. Run the DB seed SQL the skill printed (or let lazy-insert handle it on first GET to `/api/projects/<slug>/stages`)
+7. Confirm the project repo is scoped to the `aaa-dashboard-bot` App installation — without it, `sync-github-activity` silently 404s:
+
+   ```bash
+   gh api repos/Automation-Architecture/<slug>/installation --jq .id
+   # Must return 133143511 (the aaa-dashboard-bot install ID)
+   # If it returns 404, add the repo via GitHub → Settings → GitHub Apps → aaa-dashboard-bot → Repository access
+   ```
 
 ## Verify before moving on
 

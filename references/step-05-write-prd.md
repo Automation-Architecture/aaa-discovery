@@ -8,14 +8,10 @@ The PRD does not go into user stories, sub-tasks, API contracts, or data model d
 
 ## How to invoke
 
-Use the Skill tool with `to-prd`, explicitly pointing it at the brief and the locked decisions:
+Use the Skill tool with `to-prd`, passing the brief and grill session paths as a string:
 
-```python
-Skill(skill="to-prd", args={
-  "brief": "spec/project-brief.md",
-  "decisions": "spec/GRILL_SESSION.md",
-  "structure": "overview, problem-statement, objectives, solution, epics"
-})
+```
+Skill(skill="to-prd", args="spec/project-brief.md spec/GRILL_SESSION.md")
 ```
 
 The skill reads both files and synthesizes. It does not rely on conversation context — the brief and `GRILL_SESSION.md` are the authoritative inputs.
@@ -96,7 +92,7 @@ a technical purpose, it is not an Epic here — it belongs in the tech
 spec as an implementation concern.
 
 > **Epic shape standard:** Before writing Epics, read
-> `aaa-SOP/discovery-sop.md §2 — Epic Scope Standard`. The SOP defines
+> `~/Documents/aaa/engineering/internal/aaa-SOP/discovery-sop.md §2 — Epic Scope Standard`. The SOP defines
 > what makes a valid feature epic, the named exceptions (enabler epics,
 > compliance/external-gate epics), and the ratio check. Epics that don't
 > meet the standard must be restructured before the PRD is committed.

@@ -20,7 +20,7 @@ If the engineer needs a re-discovery round, **throughput failed**. If the build 
 
 Most of the 13 steps are operator-driven and fast. One has an external dependency that drives the wall-clock:
 
-- **Step 8 (engineer-led architecture grill):** ≤ 16 hours from `#po` notification → engineer fills the last `Decision.` line. If the engineer hasn't picked it up within 8 hours of the message, escalate to PM.
+- **Step 7 (engineer-led architecture grill):** ≤ 16 hours from `#po` notification → engineer fills the last `Decision.` line. If the engineer hasn't picked it up within 8 hours of the message, escalate to PM.
 
 If that sub-target holds, the remaining steps comfortably fit inside 24 hours.
 
@@ -46,7 +46,7 @@ Quality is the floor we don't drop below — enforced not by document length but
 
 The design constraint is **fewer round-trips, less re-discovery, faster handoff** — because that's where the agency loses time at scale.
 
-## Why a 15-step skill instead of a free-form process
+## Why a 13-step skill instead of a free-form process
 
 Free-form discovery looks fast in the moment but produces rework downstream. The 13 sequential steps catch the order-dependent gotchas that bit the first project that ran this flow (project-key changes, version bumps, draft refreshes, DOCX path discipline).
 

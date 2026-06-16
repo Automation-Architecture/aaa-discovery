@@ -55,6 +55,16 @@ pandoc spec/<source>.md -o /tmp/<new-filename>.docx --from markdown --to docx
 
 Upload the new version via Drive MCP, then delete or trash the prior version. Do not leave both in Drive.
 
+## Disambiguating multiple DOCX versions in Drive
+
+If more than one DOCX exists for the same document (e.g., both `v1.0` and `v1.1` after a post-grill PRD revision), identify the stale one by checking `modifiedTime`:
+
+```
+mcp__claude_ai_Google_Drive__get_file_metadata({ fileId: "<file-id>" })
+```
+
+Keep the file whose `modifiedTime` is most recent and corresponds to the current markdown source. Delete or trash the older one via Drive UI — do not leave both in the folder. The step-13 digest links to these files.
+
 ## Don't do this
 
 - **Don't regenerate all three if only one changed.** Only replace files that are out of sync with their markdown source.

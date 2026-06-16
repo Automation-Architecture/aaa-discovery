@@ -30,15 +30,19 @@ one recommendation, not a menu of options.
 })
 ```
 
-After receiving the Opinion Agent's output, the Orchestrator records the decision immediately to `spec/GRILL_SESSION.md` in this format:
+After receiving the Opinion Agent's output, the Orchestrator records the decision immediately to `spec/GRILL_SESSION.md` in this format, which matches the GRILL_SESSION.md template:
 
 ```markdown
 ### <Question label>
-**Question:** <full question text>
-**Opinion Agent:** <summary of opinion agent's reasoning>
-**Decision:** <the orchestrator's final recommendation — auto-accepted>
-**Rationale:** <one sentence on why this was chosen over alternatives>
+
+<the open question, 2-3 sentences>
+
+**Recommended answer.** <Opinion Agent's recommendation with brief rationale.>
+
+**Decision.** Accept. <One sentence confirming why the recommendation stands.>
 ```
+
+Use `Refine` or `Reject` when the Orchestrator diverges from the Opinion Agent — include what changed and why. This format must match the template so Round 1 and Round 2 produce a consistent document.
 
 Run all questions sequentially. Do not batch Opinion Agents in parallel — each decision may inform the framing of the next question.
 
@@ -59,6 +63,20 @@ Do not drift into architecture (database choice, deployment platform, queue mech
 - Failure modes (fail silent? retry? fallback?)
 - AI identity disclosure (declare or stay silent?)
 - Launch criteria (what does "done" look like?)
+
+## Boundary questions (product-layer surface, architecture-layer consequence)
+
+Some questions are product-shaped on the surface but drive hard architecture constraints underneath. Examples: HIPAA compliance posture (product: disclose, never fail silent; architecture: vendor BAA selection, PHI data residency), pilot/rollout gating (product: supervised-first; architecture: feature-flag mechanism).
+
+For these, answer the product question here and record a forward reference:
+
+```markdown
+**Decision.** Accept. <product decision>
+
+> **Round 2 note:** this decision constrains <vendor selection / data residency / deployment tier>. Add to the Round 2 arch stub.
+```
+
+Do not attempt to answer the architecture question now. The forward reference ensures it lands in step 7 where the engineer can own it.
 
 ## Saving the decisions
 

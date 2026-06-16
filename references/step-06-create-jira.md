@@ -73,6 +73,16 @@ The message must include:
 - Instruction: review your assigned epics on Jira, then pull the GitHub repo — the architecture grill stub will be committed there shortly and you'll be tagged when it's ready
 - Tag Brad (`<@Brad-userid>`) with: please add `<engineer-name>` as a collaborator on `Automation-Architecture/<slug>` so they can access the grill session file
 
+## Verify engineer has GitHub repo access
+
+After sending the Slack message, confirm the engineer has been added as a collaborator. Brad adds them via GitHub UI — check that it took:
+
+```bash
+gh api repos/Automation-Architecture/<slug>/collaborators --jq '.[].login'
+```
+
+The engineer's GitHub handle must appear before step 7 Phase B begins. If it doesn't, ping Brad in `#po`. The engineer cannot pull the repo and fill in the grill session without it.
+
 ## End of step: PR to GitHub
 
 Commit any discovery tracking or config files produced in this step (e.g., updated `spec/project-brief.md` discovery phase table) and open a PR:

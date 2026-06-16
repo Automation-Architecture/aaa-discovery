@@ -8,7 +8,12 @@ A short, scannable document (~5–10 minutes to read) that captures the problem,
 
 `~/Documents/aaa/client_projects/<initials>/repo/<project>/spec/project-brief.md`
 
-(If the repo doesn't exist locally yet, the operator can stage it in a temporary working directory; step 6 creates and pushes the repo. Or create it manually with `mkdir -p` and worry about git later.)
+Brad creates the GitHub repo before discovery starts. If you haven't cloned it yet:
+
+```bash
+git clone https://github.com/Automation-Architecture/<slug> \
+  ~/Documents/aaa/client_projects/<initials>/repo/<slug>
+```
 
 ## Structure
 
