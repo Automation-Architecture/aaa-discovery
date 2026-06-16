@@ -24,7 +24,7 @@ If no engineer is assigned, **stop**. Notify the operator (and Minh Anh if appli
 
 ### 2. Stage the architecture grill stub
 
-Read `spec/PRD.md` and `spec/GRILL_SESSION.md` (Round 1) end-to-end first. Many architecture decisions are already implied by the PRD — only the truly open ones go in Round 2. A good Round 2 stub:
+Read `spec/prd.md` and `spec/GRILL_SESSION.md` (Round 1) end-to-end first. Many architecture decisions are already implied by the PRD — only the truly open ones go in Round 2. A good Round 2 stub:
 
 - Lists 10–15 **open** implementation-layer questions (see "What to include" below for the menu)
 - Skips anything the PRD already locks (don't re-ask "what LLM" if the PRD says Sonnet)

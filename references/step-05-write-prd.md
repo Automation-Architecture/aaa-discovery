@@ -121,13 +121,17 @@ scope boundary — what is in and what is explicitly not in this Epic.
    - Objectives are measurable (not vague aspirations)
    - Problem Statement matches the brief
 2. Commit `spec/prd.md` to git
-3. Generate the DOCX:
+3. Generate the DOCX and upload to Drive:
    ```bash
+   # Generate locally
    pandoc spec/prd.md \
-     -o "/Users/brad/Documents/aaa/Client Docs/<Client Full Name>/prd/<slug>/<Client>-<Project>-PRD-v1.0.docx" \
+     -o /tmp/<slug>-PRD-v1.0.docx \
      --from markdown --to docx
    ```
-   Create the `prd/<slug>/` subfolder first if it doesn't exist. DOCX never lives in the repo.
+   Then upload via Google Drive MCP:
+   - Target: Onboarding Shared Drive (`0AOk2FIY4h-9gUk9PVA`) → `<Client Full Business Name>/deliverables/`
+   - Use `mcp__claude_ai_Google_Drive__create_file` with the local file path and the client deliverables folder ID
+   - Filename: `<Client>-<Project>-PRD-v1.0.docx`
 
 ## Don't do this
 

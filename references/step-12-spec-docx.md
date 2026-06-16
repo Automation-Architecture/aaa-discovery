@@ -1,98 +1,85 @@
-# Step 12 — Generate spec DOCX deliverables into Client Docs
+# Step 12 — Generate spec DOCX deliverables and upload to Drive
 
 ## Goal
 
-Every spec markdown source is rendered to a polished DOCX in `Client Docs/<Client Full Business Name>/`. This is the step that produces the DOCX deliverables referenced in the step 13 discovery digest. By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
-
-This step also enforces the global rule that DOCX deliverables live **only** in `Client Docs/<Client>/`, never in the repo.
+Every spec markdown source is rendered to a DOCX and uploaded to the client's folder in the Onboarding Shared Drive. This is the step that produces the deliverables referenced in the step 13 discovery digest. By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
 
 ## What gets converted
 
 The canonical three:
 
-| Source (markdown in repo) | Output (DOCX in Client Docs) |
-|---|---|
-| `spec/project-brief.md` (or `PROJECT_BRIEF.md`) | `Client Docs/<Client>/brief/<Client>-<Project>-Brief-v<X.Y>.docx` |
-| `spec/prd.md` (or `PRD.md`) | `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-PRD-v<X.Y>.docx` |
-| `spec/tech-spec.md` | `Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v<X.Y>.docx` |
-
-(The exact folder layout under `Client Docs/<Client>/` varies per engagement — some use `prd/<slug>/`, some use a flat `prd/`. Check the per-project memory for the established convention before you start. Match it; don't introduce a new layout mid-engagement.)
+| Source (markdown in repo) | Output filename | Drive destination |
+|---|---|---|
+| `spec/project-brief.md` | `<Client>-<Project>-Brief-v<X.Y>.docx` | Onboarding Shared Drive → `<Client Full Business Name>/deliverables/` |
+| `spec/prd.md` | `<Client>-<Project>-PRD-v<X.Y>.docx` | Onboarding Shared Drive → `<Client Full Business Name>/deliverables/` |
+| `spec/tech-spec.md` | `<Client>-<Project>-Tech-Spec-v<X.Y>.docx` | Onboarding Shared Drive → `<Client Full Business Name>/deliverables/` |
 
 ## What does NOT get converted
 
-- **`spec/GRILL_SESSION.md`** — internal grilling artifact; never goes to the client. Same for any Round 2 / architecture grill files.
-- **`spec/design-handoff-brief.md`** or other internal-only docs — operator decision per project.
-- **Addenda** (e.g., `spec/prd_addendum_<project>.md`) — convert only if the operator marks it client-facing. By default, addenda are folded into the PRD and don't ship as separate DOCX.
+- **`spec/GRILL_SESSION.md`** — internal grilling artifact; never goes to the client.
+- Internal-only docs — operator decision per project.
+- Addenda — convert only if the operator marks them client-facing.
 
 When in doubt: would the operator hand this to the client as a standalone document? If yes, convert. If no, skip.
 
-## Pandoc command pattern
+## How to generate and upload
 
-Per the global CLAUDE.md rule, pandoc writes **straight to Client Docs**, never to the repo first.
+Generate each DOCX locally to `/tmp/`, then upload via the Google Drive MCP.
 
 ```bash
 cd ~/Documents/aaa/client_projects/<initials>/repo/<project>/spec
 
-pandoc project-brief.md \
-  -o "/Users/brad/Documents/aaa/Client Docs/<Client>/brief/<Client>-<Project>-Brief-v1.0.docx" \
-  --from markdown --to docx
-
-pandoc prd.md \
-  -o "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>-PRD-v1.0.docx" \
-  --from markdown --to docx
-
-pandoc tech-spec.md \
-  -o "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>-Tech-Spec-v1.0.docx" \
-  --from markdown --to docx
+pandoc project-brief.md -o /tmp/<slug>-Brief-v1.0.docx --from markdown --to docx
+pandoc prd.md           -o /tmp/<slug>-PRD-v1.0.docx   --from markdown --to docx
+pandoc tech-spec.md     -o /tmp/<slug>-Tech-Spec-v1.0.docx --from markdown --to docx
 ```
 
-Substitute `<Client>` (full business name), `<Project>`, `<slug>`, and `<X.Y>` (version, matching what's in the markdown source's frontmatter).
+Then for each file, upload via Google Drive MCP:
 
-If `Client Docs/<Client>/<area>/` doesn't exist, create it first. The full client name → initials mapping lives in per-project memory.
+```
+mcp__claude_ai_Google_Drive__create_file(
+  name: "<Client>-<Project>-Brief-v1.0.docx",
+  parent_folder_id: "<client-deliverables-folder-id>",
+  local_path: "/tmp/<slug>-Brief-v1.0.docx"
+)
+```
+
+**Finding the client deliverables folder ID:** Search the Onboarding Shared Drive (`0AOk2FIY4h-9gUk9PVA`) for `<Client Full Business Name>`. If a `deliverables/` subfolder doesn't exist yet, create it first with `mcp__claude_ai_Google_Drive__create_file` (folder type). Save the folder ID to project memory.
 
 ## Version bump discipline
 
-The DOCX filename's version must match the markdown source's version frontmatter. If you bumped the PRD from v1.1 to v1.2 after the tech-spec step, the DOCX must be `<Client>-<Project>-PRD-v1.2.docx`.
+The DOCX filename's version must match the markdown source's version frontmatter. If you bumped the PRD from v1.1 to v1.2, the upload must be named `<Client>-<Project>-PRD-v1.2.docx`.
 
-**Replace, don't accumulate.** When you bump from v1.1 to v1.2, delete the v1.1 DOCX from `Client Docs/<Client>/prd/<slug>/` after confirming v1.2 exists. Stale DOCX files in Client Docs create version ambiguity when referenced in the step 13 digest.
-
-```bash
-# After v1.2 is confirmed:
-rm "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/<Client>-<Project>-PRD-v1.1.docx"
-```
+**Replace, don't accumulate.** When you bump a version, delete or trash the prior version in Drive after confirming the new one uploaded cleanly. Stale DOCX files in Drive create version ambiguity when referenced in the step 13 digest.
 
 ## Verifications (run all three)
 
-1. **Each expected DOCX exists at its target path.**
-   ```bash
-   ls -la "/Users/brad/Documents/aaa/Client Docs/<Client>/brief/" \
-          "/Users/brad/Documents/aaa/Client Docs/<Client>/prd/<slug>/"
-   ```
+1. **Each expected DOCX exists in the client's Drive deliverables folder.** Use `mcp__claude_ai_Google_Drive__search_files` to confirm all three files are present with the correct names.
 
 2. **No DOCX files in the repo.**
    ```bash
    cd ~/Documents/aaa/client_projects/<initials>/repo/<project>
-   git ls-files | grep '\.docx$'   # must return nothing
-   find . -name '*.docx' -not -path './node_modules/*' -not -path './.git/*'   # must also return nothing
+   git ls-files | grep '\.docx$'
+   find . -name '*.docx' -not -path './.git/*'
    ```
-   If a stray DOCX is found in the repo, `git rm` it after confirming the Client Docs copy is current. This is a recurring pitfall (see SKILL.md common pitfalls).
+   Both must return nothing. If a stray DOCX is found, `git rm` it.
 
-3. **No financial information bled into the DOCX.** Open each generated DOCX and search for `$`, "deposit", "invoice", "pricing", "budget", "payment". Tech docs must never contain financial content (global rule). If found in the markdown, fix the markdown source, regenerate the DOCX.
+3. **No financial information in any DOCX.** Open each file and search for `$`, "deposit", "invoice", "pricing", "budget", "payment". If found in the markdown, fix the source, regenerate, re-upload.
 
 ## Don't do this
 
-- **Don't generate to the repo first and `cp` to Client Docs.** Pandoc writes straight there. The repo never sees a DOCX.
-- **Don't convert `GRILL_SESSION.md` or other internal-only files.** Client doesn't need them; they often contain candid internal reasoning, version-dump-style decisions, or rep names that don't belong in client deliverables.
-- **Don't skip the version in the filename.** `<Client>-<Project>-PRD.docx` (no version) makes it impossible to tell which version is current. Always include `-v<X.Y>`.
-- **Don't accumulate vintage versions.** Old DOCX in Client Docs creates ambiguity at the digest step. Replace, don't add.
-- **Don't include financial info.** Same global rule. If the markdown has it, remove it from the source first, then convert.
+- **Don't upload to the repo or to local `Client Docs/`.** Drive is the destination for discovery deliverables.
+- **Don't convert `GRILL_SESSION.md` or other internal-only files.** They contain internal reasoning that doesn't belong in client deliverables.
+- **Don't skip the version in the filename.** Always include `-v<X.Y>`.
+- **Don't accumulate old versions in Drive.** Replace, don't add.
+- **Don't include financial info.** Fix the markdown source first, then regenerate.
 
 ## Done when
 
-- Brief, PRD, and tech-spec DOCX all exist at their target paths in `Client Docs/<Client>/`
+- Brief, PRD, and tech-spec DOCX all exist in the client's `deliverables/` folder in the Onboarding Shared Drive
 - Filenames match the markdown sources' versions
 - No DOCX in the repo
-- No prior-version DOCX still sitting in Client Docs
-- All three files open cleanly in Word/Pages without rendering errors
+- No prior-version DOCX still in Drive
+- All three files open cleanly in Word/Pages
 
-Move to step 13 (discovery digest) — that step lists these DOCX paths in the `#po` message.
+Move to step 13 (discovery digest) — that step links to these Drive files in the `#po` message.
