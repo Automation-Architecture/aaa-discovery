@@ -32,6 +32,21 @@ Add the project key to:
 - The brief's deliverables sequence row for step 6 (status → ✅ Done with the key + board number)
 - Memory for the project so future sessions can find it
 
+## Assign the engineer
+
+Before moving to step 7, the assigned engineer must be known. Step 7 sends them a direct `#po` notification and stages their architecture grill — running it without a named engineer produces decisions no one is accountable for.
+
+Ask the PO now:
+
+> Who is the assigned engineer for this project? I need their name and Slack user ID (format: `@USERID`) so I can notify them in step 7.
+
+Save both to project memory:
+
+- **Engineer name** (e.g., "Brad")
+- **Engineer Slack user ID** (e.g., `U12345678`)
+
+If the engineer hasn't been assigned yet, **stop here** and ask the operator to assign one before proceeding. Do not move to step 7 without a named engineer.
+
 ## Don't do this
 
 - **Don't pick the project key without operator approval.** They may have a preferred convention or may need to align with a parent client project.
@@ -43,6 +58,7 @@ Add the project key to:
 - Project key captured and recorded
 - Empty board exists at the URL
 - Captured key matches what the operator confirmed (don't trust your own guess)
+- Engineer name and Slack user ID saved to project memory
 
 ## Done when
 
