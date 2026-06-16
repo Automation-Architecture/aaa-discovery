@@ -1,6 +1,6 @@
 ---
 name: aaa-discovery
-description: Walks the operator through the Automation Architecture (AAA) Discovery Phase for a new client engagement — a 12-step sequence that produces a fully scoped, ticketed, and client-informed project before any engineer writes code. Trigger this skill whenever a new client project is starting, when the operator says "kick off discovery", "start a new client", "new client engagement", "spin up a new project", "let's begin discovery", or invokes `/aaa-discovery`. Also trigger when a sales call transcript has just been read and the next step is to start scoping the work, or when the operator references "the 12 steps", "the AAA discovery flow", or "the canonical sequence". This skill orchestrates other skills (grill-me, to-prd, aaa-client-init) and agents (cto-technical-architect, board-nanny) — invoke it as the entry point so the steps run in the right order, with the right artifacts, in the right places.
+description: Walks the operator through the Automation Architecture (AAA) Discovery Phase for a new client engagement — a 13-step sequence that produces a fully scoped, ticketed, and client-informed project before any engineer writes code. Trigger this skill whenever a new client project is starting, when the operator says "kick off discovery", "start a new client", "new client engagement", "spin up a new project", "let's begin discovery", or invokes `/aaa-discovery`. Also trigger when a sales call transcript has just been read and the next step is to start scoping the work, or when the operator references "the 13 steps", "the AAA discovery flow", or "the canonical sequence". This skill orchestrates other skills (grill-me, to-prd, aaa-client-init) and agents (cto-technical-architect, board-nanny) — invoke it as the entry point so the steps run in the right order, with the right artifacts, in the right places.
 ---
 
 # AAA Discovery Phase
@@ -9,12 +9,12 @@ description: Walks the operator through the Automation Architecture (AAA) Discov
 
 Discovery is the AAA workflow that turns a sales conversation into a fully ticketed, client-informed project ready for engineers to build against. It is **12 sequential steps**, run end-to-end, before any code is written. The skill:
 
-- Tracks progress through the 12 steps using the operator's task list
+- Tracks progress through the 13 steps using the operator's task list
 - Hands off to other skills (`/grill-me`, `/to-prd`, `/aaa-client-init`) and agents (`cto-technical-architect`, `board-nanny`) at the right moments
 - Enforces output-location conventions (markdown in repo, DOCX in Onboarding Shared Drive, no financial info in tech docs)
 - Catches the order-dependent gotchas that bit the first project that ran this flow (project-key changes, version bumps, draft refreshes)
 
-The phase ends with the work fully scoped, all tickets created, the client dashboard live, all spec DOCX deliverables uploaded to the Onboarding Shared Drive, and a discovery digest posted to `#po`. **Build Phase** (engineers writing code) only begins after step 12.
+The phase ends with the work fully scoped, all tickets created, the client dashboard live, all spec DOCX deliverables uploaded to the Onboarding Shared Drive, and a discovery digest posted to `#po`. **Build Phase** (engineers writing code) only begins after step 13.
 
 ## Throughput target
 
@@ -28,7 +28,7 @@ Discovery does not start inside this skill — it starts when **Brad** completes
 2. **Uploads the signed proposal** to the Onboarding Shared Drive (`0AOk2FIY4h-9gUk9PVA`) under `<Client Full Business Name>/proposal/`.
 3. **Sends a Slack message to `#po`** tagging Elsa with the client name, slug, repo URL, and a note that the 48-hour clock has started.
 
-That Slack message is the trigger. When Elsa receives it, she runs `/aaa-discovery` in Claude Code and the 12-step sequence begins.
+That Slack message is the trigger. When Elsa receives it, she runs `/aaa-discovery` in Claude Code and the 13-step sequence begins.
 
 ## When to invoke
 
@@ -70,7 +70,7 @@ Each step has a dedicated reference file under `references/step-NN-<name>.md` wi
 
 ## Progress tracking
 
-Add the 12 steps to the task list at kickoff so the operator can see where they are. Mark each step `in_progress` when you start it and `completed` as soon as it lands — don't batch.
+Add the 13 steps to the task list at kickoff so the operator can see where they are. Mark each step `in_progress` when you start it and `completed` as soon as it lands — don't batch.
 
 ## Output-location conventions (non-negotiable)
 
@@ -84,7 +84,7 @@ These match the operator's global rules. Reread them periodically; the temptatio
 - **No financial information in any technical doc** — no budget, no pricing, no payment status, no proposal terms. That belongs in the Onboarding Shared Drive proposal folder and the sales conversation only.
 - **GitHub repos** go under the `Automation-Architecture` org — Brad creates the repo before discovery starts.
 
-## Tools and skills used across the 12 steps
+## Tools and skills used across the 13 steps
 
 | Tool / skill / agent | Steps where used |
 |----------------------|------------------|
@@ -103,14 +103,14 @@ These match the operator's global rules. Reread them periodically; the temptatio
 
 ## Phase boundary
 
-Discovery ends after step 12 (the `#po` digest is sent). **Build Phase** then takes over with three high-level steps: Phase 1 build (supervised), burn-in period, Phase 2 launch (autonomous + any remaining channels). Do not roll Build steps into this skill — they're not part of Discovery and they're project-specific.
+Discovery ends after step 13 (the `#po` digest is sent). **Build Phase** then takes over with three high-level steps: Phase 1 build (supervised), burn-in period, Phase 2 launch (autonomous + any remaining channels). Do not roll Build steps into this skill — they're not part of Discovery and they're project-specific.
 
 ## Common pitfalls (from the first run of this flow)
 
 These are the things that went sideways on the Kidneyhood Zendesk Agent project. Heads-up so you don't repeat them.
 
 1. **Project key churn.** The operator may recreate the Jira project under a new key after step 6 (e.g., `KZA` → `KHZ`). When this happens, sweep the codebase + memory + sync workflow + DOCX for stale references. The sweep is non-trivial — keep a checklist.
-2. **DOCX path discipline.** All DOCX generation happens in **step 11**, not ad-hoc throughout the flow. Pandoc writes to `/tmp/` and the Drive MCP uploads to the Onboarding Shared Drive. Never put a DOCX in the repo. All DOCX deliverables are current before the step 12 digest goes out.
+2. **DOCX path discipline.** Each document's DOCX is generated inline — brief at step 3, PRD at step 5, tech spec at step 8 — and uploaded to Drive immediately. Step 12 verifies all three are present before the digest. Pandoc writes to `/tmp/` and the Drive MCP uploads to the Onboarding Shared Drive. Never put a DOCX in the repo. All DOCX deliverables are current before the step 13 digest goes out.
 3. **`/grill-me` is two rounds, not one — and the second is engineer-led.** Round 1 (step 4) tests product scope. Round 2 (step 7) tests architecture and the **assigned engineer** drives. The operator stages a stub in `spec/GRILL_SESSION.md`, commits via PR, and sends a Slack message to `#po` tagging the engineer. Skipping round 2 — or running it without the engineer — means architecture defaults get made solo and re-litigated mid-build.
 4. **Version bumps signal substantive changes.** PRD v1.0 → v1.1 should reflect meaningful scope changes discovered during step 7 or thereafter. PRD v1.1 → v1.2 should reflect post-tech-spec corrections. Don't bump for cosmetic edits.
 
@@ -119,7 +119,7 @@ These are the things that went sideways on the Kidneyhood Zendesk Agent project.
 When this skill is invoked:
 
 1. Confirm the kickoff inputs (client name, contact, project name, slug, GitHub repo URL, Slack channels, transcript pointer)
-2. Add the 12 steps to the task list
+2. Add the 13 steps to the task list
 3. Read `references/step-01-read-transcripts.md` and start step 1
 4. Move sequentially. Don't run steps in parallel — the artifacts feed forward.
 5. After each step, mark it complete and read the next reference file before proceeding.

@@ -118,7 +118,7 @@ Reference the canonical 13-step sequence. Mark steps complete as we move through
 
 ## Generate DOCX and upload to Drive
 
-Once the brief is approved, generate a DOCX and upload it immediately — don't wait for step 11.
+Once the brief is approved, generate a DOCX and upload it immediately — don't wait for step 12.
 
 ```bash
 pandoc spec/project-brief.md \
