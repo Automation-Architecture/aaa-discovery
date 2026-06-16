@@ -108,10 +108,6 @@ Reference the canonical 13-step sequence. Mark steps complete as we move through
 | 2 | Read the signed proposal | ✅ Done |
 | 3 | Write project brief | 🔄 In progress |
 | ... | ... | ... |
-
-## Build Phase
-
-The three-step build (Phase 1 supervised, burn-in, Phase 2 launch).
 ```
 
 ## Don't do this
@@ -120,14 +116,29 @@ The three-step build (Phase 1 supervised, burn-in, Phase 2 launch).
 - **Do not pre-bake "open questions" you can answer.** The brief should already reflect what the operator and you know. Genuine open items go in the dedicated section; don't pad it.
 - **Do not duplicate the PRD.** The brief is the 10-minute version. The PRD is the 30-minute version. If you find yourself listing 39 user stories in the brief, stop and move them to the PRD.
 
+## Generate DOCX and upload to Drive
+
+Once the brief is approved, generate a DOCX and upload it immediately — don't wait for step 11.
+
+```bash
+pandoc spec/project-brief.md \
+  -o /tmp/<slug>-Brief-v1.0.docx \
+  --from markdown --to docx
+```
+
+Upload via Google Drive MCP (`mcp__claude_ai_Google_Drive__create_file`) to the Onboarding Shared Drive (`0AOk2FIY4h-9gUk9PVA`) → `<Client Full Business Name>/deliverables/`. Filename: `<Client>-<Project>-Brief-v1.0.docx`.
+
+If the `deliverables/` subfolder doesn't exist yet, create it first (folder type) and save the folder ID to project memory — steps 5 and 8 reuse it.
+
 ## Verify before moving on
 
 - File at the correct path
 - All sections present
 - No financial info
-- Discovery + Build phase tables included with step 1 marked done and step 2 in progress
+- Discovery phase table included with steps 1–2 marked done, step 3 in progress
 - Module breakdown roughly matches what the architecture sketch implies
+- DOCX uploaded to Onboarding Shared Drive `<Client Full Business Name>/deliverables/`
 
 ## Done when
 
-The brief reads well end-to-end and the operator has approved it (or you've made it good enough that the operator nods at it without asking for changes). Move to step 3.
+The brief reads well end-to-end, the operator has approved it, and the DOCX is in Drive. Move to step 4.

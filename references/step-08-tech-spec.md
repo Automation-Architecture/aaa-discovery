@@ -100,7 +100,7 @@ The agent will follow its own template, but a complete tech spec normally includ
 ## Verify before moving on
 
 - `spec/tech-spec.md` exists, committed
-- DOCX in `Client Docs/`
+- DOCX uploaded to Onboarding Shared Drive `<Client Full Business Name>/deliverables/`
 - Module names + data flow match the PRD
 - No financial info
 
