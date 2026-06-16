@@ -1,4 +1,4 @@
-# Step 9 — Write the tech spec
+# Step 8 — Write the tech spec
 
 ## Goal
 
@@ -106,4 +106,4 @@ The agent will follow its own template, but a complete tech spec normally includ
 
 ## Done when
 
-Tech spec is written and committed. Move to step 10.
+Tech spec is written and committed. Move to step 9.

@@ -1,8 +1,8 @@
-# Step 12 — Generate spec DOCX deliverables and upload to Drive
+# Step 11 — Generate spec DOCX deliverables and upload to Drive
 
 ## Goal
 
-Every spec markdown source is rendered to a DOCX and uploaded to the client's folder in the Onboarding Shared Drive. This is the step that produces the deliverables referenced in the step 13 discovery digest. By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
+Every spec markdown source is rendered to a DOCX and uploaded to the client's folder in the Onboarding Shared Drive. This is the step that produces the deliverables referenced in the step 12 discovery digest. By making it a dedicated step, you guarantee the DOCX files are **current** to the latest markdown sources.
 
 ## What gets converted
 
@@ -50,7 +50,7 @@ mcp__claude_ai_Google_Drive__create_file(
 
 The DOCX filename's version must match the markdown source's version frontmatter. If you bumped the PRD from v1.1 to v1.2, the upload must be named `<Client>-<Project>-PRD-v1.2.docx`.
 
-**Replace, don't accumulate.** When you bump a version, delete or trash the prior version in Drive after confirming the new one uploaded cleanly. Stale DOCX files in Drive create version ambiguity when referenced in the step 13 digest.
+**Replace, don't accumulate.** When you bump a version, delete or trash the prior version in Drive after confirming the new one uploaded cleanly. Stale DOCX files in Drive create version ambiguity when referenced in the step 12 digest.
 
 ## Verifications (run all three)
 
@@ -82,4 +82,4 @@ The DOCX filename's version must match the markdown source's version frontmatter
 - No prior-version DOCX still in Drive
 - All three files open cleanly in Word/Pages
 
-Move to step 13 (discovery digest) — that step links to these Drive files in the `#po` message.
+Move to step 12 (discovery digest) — that step links to these Drive files in the `#po` message.

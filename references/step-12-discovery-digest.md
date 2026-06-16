@@ -1,4 +1,4 @@
-# Step 13 — Post discovery digest to `#po`
+# Step 12 — Post discovery digest to `#po`
 
 ## Goal
 
@@ -61,9 +61,9 @@ If the GRILL_SESSION.md Round 2 surfaced any decisions worth calling out (non-ob
 Before sending, pull the actual values:
 
 - **Jira key** — from step 6
-- **Epic/task counts** — from the board-nanny output in step 10
-- **DOCX versions** — from the filenames generated in step 12
-- **Engineer Slack ID** — captured at step 8
+- **Epic/task counts** — from the board-nanny output in step 9
+- **DOCX versions** — from the filenames generated in step 11
+- **Engineer Slack ID** — captured at step 7
 
 Leave nothing as a placeholder. If a value is missing, go back to the step that was supposed to produce it.
 

@@ -1,8 +1,8 @@
-# Step 8 — Stage architecture grill stub and notify engineer via `#po`
+# Step 7 — Stage architecture grill stub and notify engineer via `#po`
 
 ## Goal
 
-Set up the second `/grill-me` round and hand it off to the engineer asynchronously. By the end of this step, `spec/GRILL_SESSION.md` has a populated Round 2 stub committed to the repo, and the assigned engineer has been notified via `#po` to pull the repo and fill in their decisions. The skill does not block here — the tech spec (step 9) waits for GRILL_SESSION.md Round 2 to be complete before running.
+Set up the second `/grill-me` round and hand it off to the engineer asynchronously. By the end of this step, `spec/GRILL_SESSION.md` has a populated Round 2 stub committed to the repo, and the assigned engineer has been notified via `#po` to pull the repo and fill in their decisions. The skill does not block here — the tech spec (step 8) waits for GRILL_SESSION.md Round 2 to be complete before running.
 
 ## Who runs this round
 
@@ -78,7 +78,7 @@ Each has a recommended starting position — react to them and record your decis
 
 ### 5. Move on
 
-After the message sends, proceed to step 9 (tech spec). Do not block the skill here waiting for the engineer's response. Step 9 requires GRILL_SESSION.md Round 2 to be complete — confirm that before running the tech spec agent.
+After the message sends, proceed to step 8 (tech spec). Do not block the skill here waiting for the engineer's response. Step 8 requires GRILL_SESSION.md Round 2 to be complete — confirm that before running the tech spec agent.
 
 ## What to include in the grill stub (architecture-layer)
 
@@ -113,8 +113,8 @@ Decisions land in `spec/GRILL_SESSION.md` under the "Round 2 — Architecture" s
 - **Don't skip this round.** It's the most-undervalued step in the canonical sequence. Skipping it means engineers make architecture defaults solo and the cost of a wrong default compounds during build.
 - **Don't run it without the engineer.** Operator-only architecture grills produce decisions the engineer will silently re-litigate mid-build. If the engineer isn't assigned yet, assign them before this step.
 - **Don't use `slack_send_message_draft`.** This step sends directly. The operator doesn't need to review the `#po` message before it goes out.
-- **Don't block the skill on the engineer's response.** Step 9 (tech spec) needs GRILL_SESSION.md Round 2 complete — but that check happens at step 9, not here.
+- **Don't block the skill on the engineer's response.** Step 8 (tech spec) needs GRILL_SESSION.md Round 2 complete — but that check happens at step 8, not here.
 
 ## Done when
 
-`spec/GRILL_SESSION.md` Round 2 stub is committed to `main` and the `#po` message is sent. Move to step 9.
+`spec/GRILL_SESSION.md` Round 2 stub is committed to `main` and the `#po` message is sent. Move to step 8.
