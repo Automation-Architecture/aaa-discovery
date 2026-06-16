@@ -68,8 +68,22 @@ whether it was met.
 ## Solution
 
 What we are building and how it addresses the problem. 4–8 bullets
-describing the system's character and key capabilities. Do not go into
-architecture — that is for the tech spec.
+describing the system's character and key capabilities from the user's
+perspective. Do not go into architecture — that is for the tech spec.
+
+---
+
+## Module Breakdown
+
+The major independently-testable components of the system. Derived from
+the brief and grill session — there is no codebase to inspect at this
+stage. Aim for deep modules: each encapsulates a significant chunk of
+functionality behind a simple, stable interface.
+
+| Module | Responsibility | Interface |
+|--------|---------------|-----------|
+| <Module name> | <One sentence: what it owns end-to-end> | In: <input> → Out: <output> |
+| ... | ... | ... |
 
 ---
 
@@ -80,6 +94,9 @@ value from. A user must be able to open it, use it, and walk away with
 something useful. If a feature is invisible to the user or only serves
 a technical purpose, it is not an Epic here — it belongs in the tech
 spec as an implementation concern.
+
+Epics should map to the modules above — an Epic typically combines one
+or more modules into a user-facing workflow.
 
 | # | Epic | What the user can do | Value delivered |
 |---|------|----------------------|-----------------|
