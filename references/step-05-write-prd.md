@@ -1,30 +1,30 @@
-# Step 4 — Write the PRD via `/to-prd`
+# Step 5 — Write the PRD
 
 ## Goal
 
-A long-form Product Requirements Document that takes every locked decision from step 3 and turns them into:
-- A formal problem statement and solution overview
-- An extensive list of user stories (typically 30+)
-- Implementation decisions (modules, APIs, data model, sequencing)
-- Testing decisions
-- Out-of-scope statements
-- Open items still pending client input
+A focused Product Requirements Document that captures the problem, the solution, and the work broken into Epics. An **Epic** is a complete, user-facing feature the user can see and get value from — not a technical layer, not a module, not a task. If a user cannot open it, use it, and walk away with something useful, it is not an Epic.
+
+The PRD does not go into user stories, sub-tasks, API contracts, or data model detail — those belong in the tech spec (step 9) and the Jira board (step 10).
 
 ## How to invoke
 
-Use the Skill tool with `to-prd`:
+Use the Skill tool with `to-prd`, explicitly pointing it at the brief and the locked decisions:
 
-```
-Skill(skill="to-prd")
+```python
+Skill(skill="to-prd", args={
+  "brief": "spec/project-brief.md",
+  "decisions": "spec/GRILL_SESSION.md",
+  "structure": "overview, problem-statement, objectives, solution, epics"
+})
 ```
 
-The skill is designed to consume the current session's context — it doesn't need to be re-fed the brief or the `/grill-me` decisions. It will read what's in the conversation and synthesize.
+The skill reads both files and synthesizes. It does not rely on conversation context — the brief and `GRILL_SESSION.md` are the authoritative inputs.
 
 ## Where it lives
 
-`~/Documents/aaa/client_projects/<initials>/repo/<project>/spec/prd.md` (v1.0)
+`spec/prd.md` (v1.0) in the project repo.
 
-## Structure (the `/to-prd` skill enforces)
+## Structure
 
 ```markdown
 # PRD: <Client Project Name>
@@ -32,51 +32,115 @@ The skill is designed to consume the current session's context — it doesn't ne
 **Version:** 1.0
 **Date:** <YYYY-MM-DD>
 **Status:** Draft
-**Source:** Distilled from `/grill-me` session
-**Companion docs:** `spec/project-brief.md`
+**Source:** `spec/project-brief.md` + `spec/GRILL_SESSION.md`
+**Companion docs:** `spec/project-brief.md`, `spec/tech-spec.md`
+
+---
+
+## Overview
+
+Two to three sentences. What the system is, who it is for, and what
+it replaces or improves.
+
+---
 
 ## Problem Statement
+
+What is broken, underused, or under-leveraged today. Plain language,
+2–3 paragraphs. This must match the brief's Problem Statement — do not
+rewrite it, summarise it.
+
+---
+
+## Objectives
+
+Four numbered, measurable outcomes the system must achieve. Each
+objective should be testable — a reviewer must be able to confirm
+whether it was met.
+
+1. <Objective 1>
+2. <Objective 2>
+3. <Objective 3>
+4. <Objective 4>
+
+---
+
 ## Solution
-## User Stories (numbered, by actor — typically 30+ across all actor groups)
-## Implementation Decisions
-  ### Module breakdown (deep, independently testable)
-  ### Key technical decisions
-  ### API contracts (high-level)
-  ### Data model (relational)
-  ### Sequencing / phased build (informs Jira population)
-## Testing Decisions
-  ### What makes a good test
-  ### Modules with required unit tests
-  ### Modules covered by integration / eval
-  ### Test layers (CI gates)
-## Out of Scope
-## Further Notes
-  ### Open items requiring client input
-  ### Risks tracked from project brief
-  ### Decisions deferred to tech spec
-  ### v2+ candidates (not committed)
+
+What we are building and how it addresses the problem. 4–8 bullets
+describing the system's character and key capabilities from the user's
+perspective. Do not go into architecture — that is for the tech spec.
+
+---
+
+## Module Breakdown
+
+The major independently-testable components of the system. Derived from
+the brief and grill session — there is no codebase to inspect at this
+stage. Aim for deep modules: each encapsulates a significant chunk of
+functionality behind a simple, stable interface.
+
+| Module | Responsibility | Interface |
+|--------|---------------|-----------|
+| <Module name> | <One sentence: what it owns end-to-end> | In: <input> → Out: <output> |
+| ... | ... | ... |
+
+---
+
+## Epics
+
+Each Epic is a complete, user-facing feature the user can see and get
+value from. A user must be able to open it, use it, and walk away with
+something useful. If a feature is invisible to the user or only serves
+a technical purpose, it is not an Epic here — it belongs in the tech
+spec as an implementation concern.
+
+> **Epic shape standard:** Before writing Epics, read
+> `aaa-SOP/discovery-sop.md §2 — Epic Scope Standard`. The SOP defines
+> what makes a valid feature epic, the named exceptions (enabler epics,
+> compliance/external-gate epics), and the ratio check. Epics that don't
+> meet the standard must be restructured before the PRD is committed.
+
+Epics should map to the modules above — an Epic typically combines one
+or more modules into a user-facing workflow.
+
+| # | Epic | What the user can do | Value delivered |
+|---|------|----------------------|-----------------|
+| 1 | <Epic name> | <User action> | <Outcome> |
+| 2 | ... | ... | ... |
+
+For each Epic, add a short paragraph below the table describing its
+scope boundary — what is in and what is explicitly not in this Epic.
 ```
 
 ## After `/to-prd` finishes
 
-1. Skim the output for:
+1. Check the output for:
    - Financial info → remove (global rule)
-   - "patient" / "client" / "user" terminology consistent with the brief
-   - Citations to the right module names from the brief's module breakdown
-   - Open items match the actual remaining unknowns
-2. Commit `spec/prd.md` to git locally (the repo is created in step 6 if it doesn't exist yet — for now just save the file)
-3. Generate the DOCX so it's ready for the client deliverable in step 12:
+   - Each Epic passes the usability test: can a user open it, use it, and get value from it?
+   - Objectives are measurable (not vague aspirations)
+   - Problem Statement matches the brief
+2. Commit `spec/prd.md` to git
+3. Generate the DOCX and upload to Drive:
    ```bash
-   pandoc spec/prd.md -o "/Users/brad/Documents/aaa/Client Docs/<Client Full Name>/prd/<project-slug>/<Client>-<Project>-PRD-v1.0.docx" --from markdown --to docx
+   # Generate locally
+   pandoc spec/prd.md \
+     -o /tmp/<slug>-PRD-v1.0.docx \
+     --from markdown --to docx
    ```
-   Note: the `Client Docs` folder may not have a `prd/<project-slug>/` subfolder yet — `mkdir -p` it first. Path discipline: DOCX never lives in the repo.
+   Then upload via Google Drive MCP:
+   - Target: Onboarding Shared Drive (`0AOk2FIY4h-9gUk9PVA`) → `<Client Full Business Name>/deliverables/`
+   - Use `mcp__claude_ai_Google_Drive__create_file` with the local file path and the client deliverables folder ID
+   - Filename: `<Client>-<Project>-PRD-v1.0.docx`
 
 ## Don't do this
 
+- **Don't include user stories, sub-tasks, or acceptance criteria.** Those belong in the Jira board (step 10), not the PRD.
+- **Don't include technical Epics** (e.g., "Database schema", "API layer", "Infrastructure setup"). If a user cannot interact with it and get value, it is not an Epic in this document — put it in the tech spec.
 - **Don't paste financial info into the PRD.** Same global rule as the brief.
-- **Don't have the PRD contradict the brief.** If the brief says "scope is X" and the PRD says "scope is Y", you missed carrying over a decision from the grill session. Reconcile.
-- **Don't re-litigate decisions in the PRD.** If `/grill-me` decided something, the PRD records the decision and moves on. The PRD is not a discussion document.
+- **Don't re-litigate decisions.** If `spec/GRILL_SESSION.md` decided something, the PRD records it and moves on.
+- **Don't contradict the brief.** If scope differs, reconcile the brief first, then write the PRD.
 
 ## Done when
 
-PRD is written, committed to local git (or saved to disk if repo doesn't exist yet), DOCX is generated to `Client Docs/`, no financial info, no contradictions with the brief. Move to step 5.
+PRD is written and committed, DOCX generated to `Client Docs/`, no financial info, every Epic passes the usability test, Objectives are measurable. Move to step 6.

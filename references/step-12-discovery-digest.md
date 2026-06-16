@@ -1,4 +1,4 @@
-# Step 13 — Post discovery digest to `#po`
+# Step 12 — Post discovery digest to `#po`
 
 ## Goal
 
@@ -18,7 +18,7 @@ Discovery complete: <Project Name> (<slug>)
 
 ### Step checklist
 
-All 13 steps with completion markers:
+All 12 steps with completion markers:
 
 ```
 ✅ 1 — Read transcripts
@@ -27,13 +27,12 @@ All 13 steps with completion markers:
 ✅ 4 — Product grill session
 ✅ 5 — PRD
 ✅ 6 — Jira board created (<JIRA-KEY>)
-✅ 7 — GitHub repo created
-✅ 8 — Architecture grill stub → <@engineer-userid>
-✅ 9 — Tech spec
-✅ 10 — Board populated (N epics, M tasks)
-✅ 11 — Client dashboard live
-✅ 12 — DOCX deliverables generated
-✅ 13 — This message
+✅ 7 — Architecture grill stub → <@engineer-userid>
+✅ 8 — Tech spec
+✅ 9 — Board populated (N epics, M tasks)
+✅ 10 — Client dashboard live
+✅ 11 — DOCX deliverables uploaded to Drive
+✅ 12 — This message
 ```
 
 ### Key artifacts
@@ -42,7 +41,7 @@ All 13 steps with completion markers:
 Repo: https://github.com/Automation-Architecture/<slug>
 Jira: https://automationarchitecture.atlassian.net/jira/software/projects/<KEY>/boards
 Dashboard: https://dashboard.automationarchitecture.ai/client/<slug>
-DOCX: Client Docs/<Client Full Business Name>/ — Brief v<X>, PRD v<X>, Tech Spec v<X>
+DOCX: Onboarding Shared Drive → <Client Full Business Name>/deliverables/ — Brief v<X>, PRD v<X>, Tech Spec v<X>
 ```
 
 ### Engineer + next milestone
@@ -61,9 +60,9 @@ If the GRILL_SESSION.md Round 2 surfaced any decisions worth calling out (non-ob
 Before sending, pull the actual values:
 
 - **Jira key** — from step 6
-- **Epic/task counts** — from the board-nanny output in step 10
-- **DOCX versions** — from the filenames generated in step 12
-- **Engineer Slack ID** — captured at step 8
+- **Epic/task counts** — from the board-nanny output in step 9
+- **DOCX versions** — from the filenames generated in step 11
+- **Engineer Slack ID** — captured at step 7
 
 Leave nothing as a placeholder. If a value is missing, go back to the step that was supposed to produce it.
 
@@ -71,7 +70,7 @@ Leave nothing as a placeholder. If a value is missing, go back to the step that 
 
 - **Don't send to any channel other than `#po`.** This is an internal team digest, not a client-facing communication.
 - **Don't include financial information.** No pricing, payment status, contract terms — same global rule.
-- **Don't leave placeholder values.** All 13 steps are done before this message goes out; every field should be concrete.
+- **Don't leave placeholder values.** All 12 steps are done before this message goes out; every field should be concrete.
 
 ## Done when
 
