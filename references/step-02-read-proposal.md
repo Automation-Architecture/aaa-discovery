@@ -24,7 +24,7 @@ To read the file once located, use `mcp__claude_ai_Google_Drive__read_file_conte
 
 If the proposal isn't in the Onboarding Shared Drive, **stop and ask the operator** — Discovery should not proceed without one. The proposal is what got the client to sign and is non-negotiable as a Discovery input.
 
-> **Note:** The previous location was `~/Documents/aaa/Client Docs/<Client Full Business Name>/proposal/`. Proposals for new engagements are now stored in the Onboarding Shared Drive instead.
+> **Migrated 2026-06-15:** Proposals moved from `~/Documents/aaa/Client Docs/<Client Full Business Name>/proposal/` to the Onboarding Shared Drive. The local path no longer contains the source document for any engagement.
 
 ## What to extract
 
@@ -38,7 +38,7 @@ If the proposal isn't in the Onboarding Shared Drive, **stop and ask the operato
 
 ## What NOT to extract into tech docs
 
-The proposal contains financial information (pricing, payment terms, invoicing schedule). **Do not surface any of this in the brief, PRD, tech spec, README, Jira, or any other tech artifact.** Per the operator's global rule: tech docs stay technical. Financial content stays in `Client Docs/<Client>/proposal/` and the sales conversation only.
+The proposal contains financial information (pricing, payment terms, invoicing schedule). **Do not surface any of this in the brief, PRD, tech spec, README, Jira, or any other tech artifact.** Per the operator's global rule: tech docs stay technical. Financial content stays in the proposal (on the Onboarding Shared Drive) and the sales conversation only — it never crosses into any technical document.
 
 When you read the proposal in this step, *use* the budget/timeline information to inform your understanding of constraints, but never copy it into a tech doc. The "Timeline" you write in the brief should be in calendar terms (e.g., "2–3 week build window") not in invoicing terms.
 
