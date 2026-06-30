@@ -1,0 +1,18 @@
+project:
+  name: "AI Roofing Cost Estimator"
+  client: "Tom"
+  slug: "roofdata-sprint"
+  slack_contact_channel: ""  # no client-facing Slack channel
+  api_base_url: "https://roofdata.report"  # existing on-premises deployment
+  stage: "discovery"
+  closed_stages: []
+  started: "2026-06-23"
+  target_launch: "2026-07-25"  # Simon Property Group demo — hard deadline
+  jira_project_key: "RDS"  # TBD — confirm with Vauyani when Jira project is created
+  description: >
+    AI-powered natural language cost estimator embedded into the roofdata.report platform.
+    Allows authenticated building owners, contractors, and consultants to ask plain-English
+    roofing cost questions and receive data-backed estimates (material $/sqft, labour $/sqft,
+    combined $/sqft, project cost range) drawn from 25+ years of real commercial project data.
+    Three-tier confidence model, multi-turn session context, and role-based access control.
+  engagement_type: "Project · AI Feature Integration"
