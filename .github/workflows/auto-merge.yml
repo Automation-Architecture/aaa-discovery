@@ -66,6 +66,30 @@ jobs:
             exit 0
           fi
 
+          # -- Gate: no unresolved review findings on THIS head SHA -----------
+          # A review is not a check-run, so the check gate above cannot see Codex
+          # findings. Two PRs merged over an unaddressed P1 this way:
+          # aaa-SOP#35 (ef42f3b) and invoice-tracker#13 (d742b80), both by
+          # github-actions[bot]. Mirrors doc-auto-merge.sh review_verdict().
+          #
+          # GitHub advances an inline comment's commit_id to the current head for as
+          # long as it still applies to the diff; once the flagged hunk changes the
+          # comment goes outdated and stops matching. So "commit_id == $SHA" means
+          # "findings that still apply to the code we are about to merge".
+          #
+          # Fails CLOSED -- an unreadable gate is not a passed gate. A blocked PR is
+          # not stuck: a human reads the finding and merges, or pushes a fix.
+          if ! FINDING_IDS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/comments" --paginate \
+               --jq '.[] | select(.commit_id == "'"$SHA"'") | .id' 2>/dev/null); then
+            echo "::warning::Could not read review comments for #$PR_NUMBER -- not merging."
+            exit 0
+          fi
+          FINDINGS=$(printf '%s' "$FINDING_IDS" | grep -c . || true)
+          if [ "$FINDINGS" -gt 0 ]; then
+            echo "::notice::$FINDINGS unresolved review finding(s) on $SHA -- not merging; a human should read them."
+            exit 0
+          fi
+          
           echo "All checks green. Merging PR #$PR_NUMBER..."
           gh pr merge "$PR_NUMBER" --squash --delete-branch --repo "$REPO" && exit 0
           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch --repo "$REPO" && exit 0
