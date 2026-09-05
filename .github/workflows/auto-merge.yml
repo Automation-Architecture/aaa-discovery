@@ -84,6 +84,27 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Revoke a queued native auto-merge and verify the revocation stuck.
+          # `gh pr merge --disable-auto` can fail transiently; swallowing that
+          # would leave GitHub free to merge the PR the moment its outstanding
+          # requirement clears, bypassing every gate below. So: check, revoke,
+          # re-check, and shout if it is still armed.
+          revoke_auto_merge() {
+            local pr="$1" armed
+            armed=$(gh pr view "$pr" --repo "$REPO" --json autoMergeRequest \
+                    --jq '.autoMergeRequest != null' 2>/dev/null || echo unknown)
+            [ "$armed" = "false" ] && return 0
+            gh pr merge "$pr" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
+            armed=$(gh pr view "$pr" --repo "$REPO" --json autoMergeRequest \
+                    --jq '.autoMergeRequest != null' 2>/dev/null || echo unknown)
+            if [ "$armed" != "false" ]; then
+              echo "::error::Could not revoke queued auto-merge on #$pr - it may merge despite these gates."
+              return 1
+            fi
+            echo "::notice::Revoked queued auto-merge on #$pr; this workflow decides when it merges."
+            return 0
+          }
+
           case "$EVENT" in
             pull_request_review) PR_LIST="$PRR_PR" ;;
             workflow_run)        PR_LIST="$WR_PR" ;;
@@ -112,6 +133,11 @@ jobs:
             fi
             [ "$STATE" != "open" ] && { echo "state=$STATE — skip."; continue; }
             [ "$DRAFT" = "true" ]  && { echo "draft — skip."; continue; }
+
+            # Do this BEFORE any gate. Every exit below - checks pending, checks
+            # failed, findings, unreadable gate - must not leave a queued merge
+            # armed behind it.
+            revoke_auto_merge "$PR_NUMBER" || continue
 
             # ── Gate 1: check-runs on the current head ──────────────────────
             CHECKS=$(gh api "/repos/$REPO/commits/$SHA/check-runs" --paginate --jq '.check_runs[]' | jq -s '.')
@@ -192,24 +218,21 @@ jobs:
             if ! FINDING_IDS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/comments" --paginate \
                  --jq '.[] | select(.commit_id == "'"$SHA"'") | .id' 2>/dev/null); then
               echo "::warning::Could not read review comments for #$PR_NUMBER -- not merging."
-              # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
-              # Without this the PR still merges the moment the outstanding requirement
-              # clears -- exactly what this gate exists to prevent.
-              gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
               continue
             fi
             FINDINGS=$(printf '%s' "$FINDING_IDS" | grep -c . || true)
             if [ "$FINDINGS" -gt 0 ]; then
               echo "::notice::$FINDINGS unresolved review finding(s) on $SHA -- not merging; a human should read them."
-              # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
-              # Without this the PR still merges the moment the outstanding requirement
-              # clears -- exactly what this gate exists to prevent.
-              gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
               continue
             fi
             
             echo "Merging PR #$PR_NUMBER..."
             gh pr merge "$PR_NUMBER" --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && continue
-            gh pr merge "$PR_NUMBER" --auto --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && continue
-            echo "::warning::Both merge attempts failed for PR #$PR_NUMBER."
+            # Deliberately NO `--auto` fallback. Queuing native auto-merge hands
+            # the decision to GitHub, which merges once the blocking requirement
+            # clears WITHOUT re-running anything here - the findings gate, the
+            # review grace and the head pin are all bypassed. The */10 sweep
+            # retries instead, re-evaluating every gate against the head as it is
+            # at that moment. A blocked PR waits; it does not slip through.
+            echo "::notice::PR #$PR_NUMBER not mergeable yet - leaving it for the next sweep."
           done
