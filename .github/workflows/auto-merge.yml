@@ -1,17 +1,54 @@
-name: Auto-Merge when Checks Green
+name: Auto-Merge when Checks Green and Reviews In
 
-# Squash-merges a PR once all check-runs on the HEAD SHA complete with no failures.
+# Squash-merges a PR once check-runs on the HEAD SHA are green AND every
+# required reviewer has reviewed — or the review grace period has expired.
+#
+# ── Why a grace period rather than a hard review gate ──────────────────────
+# The defect this fixes is a RACE, not an absent reviewer. On aaa-runbooks#74 the
+# workflow merged 77 seconds before Codex submitted a review reporting a
+# broken snippet that had already reached main. A bounded wait closes that.
+#
+# A hard gate cannot work org-wide, and two attempts proved it:
+#   - Codex is enabled PER REPO in ChatGPT settings, not by the org-wide App
+#     install. On a repo without it, a hard gate blocks every PR forever.
+#   - Codex reviews on PR open / ready-for-review / `@codex review`, NOT on
+#     push. Requiring a review of the current HEAD SHA deadlocks the moment
+#     anyone pushes a follow-up commit. (Shipped and reverted, aaa-runbooks#77 -> #78.)
+#
+# So: wait for reviews, but not indefinitely. On a repo with a working
+# reviewer this waits and gets the review. On a repo with none it proceeds
+# after REVIEW_GRACE_SECONDS, matching the old behaviour rather than stalling.
+#
+# BE CLEAR ABOUT WHAT THIS GUARANTEES: it closes the race. It is NOT a review
+# guarantee — a merge after grace expiry is an unreviewed merge, logged as a
+# ::warning::. A genuine guarantee needs branch protection requiring approvals
+# from something that actually approves; Codex posts COMMENTED, never APPROVED.
+#
+# claude[bot] is deliberately NOT in REQUIRED_REVIEWERS: as of 2026-08-31 every
+# review it posts is "Code review skipped — your organization's overage spend
+# limit has been reached". Requiring a skip notice is worse than requiring
+# nothing. Re-add it once an admin raises the limit at
+# claude.ai/admin-settings/claude-code.
+#
+# ── Triggers ───────────────────────────────────────────────────────────────
+#   workflow_run          — CI finished. Usually BEFORE the review bots submit.
+#   pull_request_review   — a review landed; re-evaluate immediately.
+#   schedule              — sweep open PRs so grace expiry is actually reached.
+#                           Without this, a PR whose reviewer never shows up
+#                           gets no further event and would wait forever.
 #
 # Uses workflow_run (not check_suite) because GitHub does not emit check_suite
 # events for GITHUB_TOKEN-run CI workflows. workflow_run is always emitted.
-#
-# Lists "CI" — the workflow name in ci.yml. The check-runs gate examines ALL
-# check-runs on the SHA, not just the triggering one.
 
 on:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
+  pull_request_review:
+    types: [submitted, dismissed]
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,87 +56,160 @@ permissions:
   checks: read
 
 concurrency:
-  group: auto-merge-${{ github.repository }}-${{ github.event.workflow_run.head_sha }}
+  group: auto-merge-${{ github.repository }}-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.event.pull_request.number || 'sweep' }}
   cancel-in-progress: false
 
 jobs:
   auto-merge:
-    if: github.event.workflow_run.pull_requests[0] != null
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'pull_request_review' ||
+      github.event.workflow_run.pull_requests[0] != null
     runs-on: ubuntu-latest
     steps:
       - name: Evaluate and merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          WR_PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+          PRR_PR: ${{ github.event.pull_request.number }}
+          # Reviewers that must weigh in before a merge, comma-separated GitHub
+          # logins exactly as they appear in the reviews API.
+          REQUIRED_REVIEWERS: "chatgpt-codex-connector[bot]"
+          # How long to wait past checks-green for those reviews before merging
+          # anyway. Observed review lag: 77s (aaa-runbooks#74), 49s (#77). 600s is generous.
+          REVIEW_GRACE_SECONDS: "600"
         run: |
           set -euo pipefail
 
-          SHA="${{ github.event.workflow_run.head_sha }}"
-          PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number }}"
+          case "$EVENT" in
+            pull_request_review) PR_LIST="$PRR_PR" ;;
+            workflow_run)        PR_LIST="$WR_PR" ;;
+            *)                   PR_LIST=$(gh pr list --repo "$REPO" --state open \
+                                   --json number --jq '.[].number' | tr '\n' ' ') ;;
+          esac
 
-          if [ -z "$PR_NUMBER" ]; then
-            echo "No open PR for SHA $SHA — nothing to merge."
+          if [ -z "${PR_LIST// /}" ]; then
+            echo "No PRs to evaluate for $EVENT."
             exit 0
           fi
-          echo "PR #$PR_NUMBER  HEAD $SHA"
+          echo "Evaluating PR(s): $PR_LIST  (via $EVENT)"
 
-          CHECK_RUNS=$(gh api "/repos/$REPO/commits/$SHA/check-runs" --paginate \
-            --jq '.check_runs[]' | jq -s '.')
+          for PR_NUMBER in $PR_LIST; do
+            echo "──────────── PR #$PR_NUMBER ────────────"
 
-          TOTAL=$(echo "$CHECK_RUNS"   | jq 'length')
-          PENDING=$(echo "$CHECK_RUNS" | jq '[.[] | select(.status != "completed")] | length')
-          FAILED=$(echo "$CHECK_RUNS"  | jq '[.[] | select(
-            .conclusion == "failure" or .conclusion == "timed_out" or
-            .conclusion == "cancelled" or .conclusion == "action_required"
-          )] | length')
+            PR=$(gh api "/repos/$REPO/pulls/$PR_NUMBER")
+            SHA=$(echo "$PR"    | jq -r '.head.sha')
+            STATE=$(echo "$PR"  | jq -r '.state')
+            DRAFT=$(echo "$PR"  | jq -r '.draft')
+            PENDING_REVIEWERS=$(echo "$PR" | jq '([.requested_reviewers[]?.login] + [.requested_teams[]?.slug]) | length')
 
-          if [ "$TOTAL" -eq 0 ]; then
-            echo "No check-runs for $SHA — not merging."
-            exit 0
-          fi
-          if [ "$PENDING" -gt 0 ]; then
-            echo "$PENDING check(s) still pending — waiting for next trigger."
-            exit 0
-          fi
-          if [ "$FAILED" -gt 0 ]; then
-            echo "$FAILED check(s) failed — not merging."
-            exit 0
-          fi
+            if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then
+              echo "::error::Could not resolve HEAD SHA for #$PR_NUMBER — skipping."
+              continue
+            fi
+            [ "$STATE" != "open" ] && { echo "state=$STATE — skip."; continue; }
+            [ "$DRAFT" = "true" ]  && { echo "draft — skip."; continue; }
 
-          # -- Gate: no unresolved review findings on THIS head SHA -----------
-          # A review is not a check-run, so the check gate above cannot see Codex
-          # findings. Two PRs merged over an unaddressed P1 this way:
-          # aaa-SOP#35 (ef42f3b) and invoice-tracker#13 (d742b80), both by
-          # github-actions[bot]. Mirrors doc-auto-merge.sh review_verdict().
-          #
-          # GitHub advances an inline comment's commit_id to the current head for as
-          # long as it still applies to the diff; once the flagged hunk changes the
-          # comment goes outdated and stops matching. So "commit_id == $SHA" means
-          # "findings that still apply to the code we are about to merge".
-          #
-          # Fails CLOSED -- an unreadable gate is not a passed gate. A blocked PR is
-          # not stuck: a human reads the finding and merges, or pushes a fix.
-          if ! FINDING_IDS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/comments" --paginate \
-               --jq '.[] | select(.commit_id == "'"$SHA"'") | .id' 2>/dev/null); then
-            echo "::warning::Could not read review comments for #$PR_NUMBER -- not merging."
-            # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
-            # Without this the PR still merges the moment the outstanding requirement
-            # clears -- exactly what this gate exists to prevent.
-            gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
-            exit 0
-          fi
-          FINDINGS=$(printf '%s' "$FINDING_IDS" | grep -c . || true)
-          if [ "$FINDINGS" -gt 0 ]; then
-            echo "::notice::$FINDINGS unresolved review finding(s) on $SHA -- not merging; a human should read them."
-            # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
-            # Without this the PR still merges the moment the outstanding requirement
-            # clears -- exactly what this gate exists to prevent.
-            gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
-            exit 0
-          fi
-          
-          echo "All checks green. Merging PR #$PR_NUMBER..."
-          gh pr merge "$PR_NUMBER" --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && exit 0
-          gh pr merge "$PR_NUMBER" --auto --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && exit 0
-          echo "::warning::Both merge attempts failed for PR #$PR_NUMBER."
-          exit 0
+            # ── Gate 1: check-runs on the current head ──────────────────────
+            CHECKS=$(gh api "/repos/$REPO/commits/$SHA/check-runs" --paginate --jq '.check_runs[]' | jq -s '.')
+            TOTAL=$(echo "$CHECKS"   | jq 'length')
+            PENDING=$(echo "$CHECKS" | jq '[.[] | select(.status != "completed")] | length')
+            FAILED=$(echo "$CHECKS"  | jq '[.[] | select(
+              .conclusion == "failure" or .conclusion == "timed_out" or
+              .conclusion == "cancelled" or .conclusion == "action_required"
+            )] | length')
+
+            [ "$TOTAL" -eq 0 ]   && { echo "no check-runs — skip."; continue; }
+            [ "$PENDING" -gt 0 ] && { echo "$PENDING check(s) pending — skip."; continue; }
+            [ "$FAILED" -gt 0 ]  && { echo "$FAILED check(s) failed — skip."; continue; }
+            echo "Gate 1 OK: $TOTAL check-run(s) green."
+
+            # ── Gate 2: reviews, with grace ─────────────────────────────────
+            # Reviews of ANY commit count. Requiring the current HEAD SHA
+            # deadlocks, because Codex does not review on push (see aaa-runbooks#78).
+            REVIEWS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate --jq '.[]' | jq -s '.')
+
+            CHANGES_REQUESTED=$(echo "$REVIEWS" | jq '[.[] | select(.state == "CHANGES_REQUESTED")] | length')
+            if [ "$CHANGES_REQUESTED" -gt 0 ]; then
+              echo "changes requested — not merging."
+              continue
+            fi
+
+            # Fail CLOSED on counting: demand positive confirmation of the full
+            # set, never merge because a "missing" string happened to be empty.
+            WANTED=0; MATCHED=0; MISSING=""
+            while IFS= read -r R; do
+              R="$(echo "$R" | xargs)"; [ -z "$R" ] && continue
+              WANTED=$((WANTED + 1))
+              SEEN=$(echo "$REVIEWS" | jq --arg r "$R" '[.[] | select(.user.login == $r)] | length')
+              if [ "$SEEN" -gt 0 ]; then MATCHED=$((MATCHED + 1)); else MISSING="$MISSING $R"; fi
+            done < <(echo "$REQUIRED_REVIEWERS" | tr ',' '\n')
+
+            if [ "$WANTED" -eq 0 ]; then
+              echo "::error::REQUIRED_REVIEWERS is empty — refusing to merge unreviewed."
+              continue
+            fi
+
+            if [ "$PENDING_REVIEWERS" -gt 0 ] || [ "$MATCHED" -ne "$WANTED" ]; then
+              # Grace is measured from when the LAST check-run finished, i.e.
+              # the moment this PR first became mergeable. Not from PR creation,
+              # which would let a long CI run consume the entire window.
+              GREEN_AT=$(echo "$CHECKS" | jq -r '[.[].completed_at] | max // empty')
+              if [ -z "$GREEN_AT" ] || [ "$GREEN_AT" = "null" ]; then
+                echo "no completed_at on check-runs — holding for review."
+                continue
+              fi
+              GREEN_EPOCH=$(date -u -d "$GREEN_AT" +%s)
+              AGE=$(( $(date -u +%s) - GREEN_EPOCH ))
+
+              if [ "$AGE" -lt "$REVIEW_GRACE_SECONDS" ]; then
+                echo "Waiting for review(s):$MISSING — ${AGE}s of ${REVIEW_GRACE_SECONDS}s grace elapsed."
+                echo "::notice::PR #$PR_NUMBER held ${AGE}s/${REVIEW_GRACE_SECONDS}s for review:$MISSING"
+                continue
+              fi
+
+              echo "::warning::PR #$PR_NUMBER merging UNREVIEWED — grace of ${REVIEW_GRACE_SECONDS}s expired (${AGE}s) waiting on:$MISSING"
+            else
+              echo "Gate 2 OK: $MATCHED/$WANTED required reviewer(s) have reviewed."
+            fi
+
+            # -- Gate: no unresolved review findings on THIS head SHA -----------
+            # A review is not a check-run, so the check gate above cannot see Codex
+            # findings. Two PRs merged over an unaddressed P1 this way:
+            # aaa-SOP#35 (ef42f3b) and invoice-tracker#13 (d742b80), both by
+            # github-actions[bot]. Mirrors doc-auto-merge.sh review_verdict().
+            #
+            # GitHub advances an inline comment's commit_id to the current head for as
+            # long as it still applies to the diff; once the flagged hunk changes the
+            # comment goes outdated and stops matching. So "commit_id == $SHA" means
+            # "findings that still apply to the code we are about to merge".
+            #
+            # Fails CLOSED -- an unreadable gate is not a passed gate. A blocked PR is
+            # not stuck: a human reads the finding and merges, or pushes a fix.
+            if ! FINDING_IDS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/comments" --paginate \
+                 --jq '.[] | select(.commit_id == "'"$SHA"'") | .id' 2>/dev/null); then
+              echo "::warning::Could not read review comments for #$PR_NUMBER -- not merging."
+              # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
+              # Without this the PR still merges the moment the outstanding requirement
+              # clears -- exactly what this gate exists to prevent.
+              gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
+              continue
+            fi
+            FINDINGS=$(printf '%s' "$FINDING_IDS" | grep -c . || true)
+            if [ "$FINDINGS" -gt 0 ]; then
+              echo "::notice::$FINDINGS unresolved review finding(s) on $SHA -- not merging; a human should read them."
+              # Revoke any auto-merge armed by an earlier run's `--auto` fallback.
+              # Without this the PR still merges the moment the outstanding requirement
+              # clears -- exactly what this gate exists to prevent.
+              gh pr merge "$PR_NUMBER" --disable-auto --repo "$REPO" >/dev/null 2>&1 || true
+              continue
+            fi
+            
+            echo "Merging PR #$PR_NUMBER..."
+            gh pr merge "$PR_NUMBER" --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && continue
+            gh pr merge "$PR_NUMBER" --auto --squash --match-head-commit "$SHA" --delete-branch --repo "$REPO" && continue
+            echo "::warning::Both merge attempts failed for PR #$PR_NUMBER."
+          done
