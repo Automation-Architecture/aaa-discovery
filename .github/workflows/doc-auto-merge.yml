@@ -27,8 +27,12 @@ name: Doc auto-merge
 #     is what review/verdict shows until its re-run after ready_for_review or
 #     an unlabel lands), none concluded failure, timed_out, startup_failure or
 #     stale, and no commit status is pending, failure or error.
-# `cancelled` is not a failure: every PR carries superseded runs that a
-# concurrency group cancelled (review-verdict's `publish` job on every PR).
+# A `cancelled` newest run is a failure (it validated nothing; Codex on the
+# wave-1 rollout), EXCEPT a cancelled job of review-verdict.yml or of this
+# file: those are superseded by a concurrency group on every PR (review-
+# verdict's `publish`), and their real output is the `review/verdict` check.
+# Which workflow a cancelled Actions job belongs to is read from its run
+# (details_url -> actions/runs/<id> -> path), never guessed from its name.
 # Not counted: this job's own check, and the reviewer checks in
 # IGNORED_CHECKS (Greptile is a reviewer, not CI, and no review is required).
 # In a ruleset repo, `review/verdict` is required, and review-verdict.yml
@@ -94,6 +98,9 @@ permissions:
   pull-requests: write
   checks: read
   statuses: read
+  # Reading which workflow a cancelled Actions job belongs to
+  # (GET actions/runs/<id>) needs Actions read.
+  actions: read
 
 concurrency:
   # One run per PR HEAD COMMIT; the newest event for that commit wins and
@@ -102,7 +109,9 @@ concurrency:
   # run waiting on the new head's CI (Codex P1 on .github#54). Such a run
   # refuses on its own (HEAD_HINT). A dispatch is keyed by PR number; a
   # workflow_run with no PR (a push to main) gets a throwaway group.
-  group: doc-auto-merge-${{ github.repository }}-${{ github.event.pull_request.head.sha || (github.event.workflow_run.pull_requests[0] && github.event.workflow_run.head_sha) || (github.event.inputs.pr_number && format('pr-{0}', github.event.inputs.pr_number)) || format('none-{0}', github.run_id) }}
+  # Keyed on PR number AND head SHA: two open PRs at one commit must not
+  # cancel each other (Codex on the wave-1 rollout PRs).
+  group: doc-auto-merge-${{ github.repository }}-${{ (github.event.pull_request && format('{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha)) || (github.event.workflow_run.pull_requests[0] && format('{0}-{1}', github.event.workflow_run.pull_requests[0].number, github.event.workflow_run.head_sha)) || (github.event.inputs.pr_number && format('pr-{0}', github.event.inputs.pr_number)) || format('none-{0}', github.run_id) }}
   cancel-in-progress: true
 
 jobs:
@@ -177,7 +186,21 @@ jobs:
                 if (.labels | type) != "array" then "unreadable"
                 elif any(.labels[]; .name == $l) then "yes" else "no" end')" in
               no) ;;
-              yes) done_ "held by the ${HOLD_LABEL} label; a person merges it." ;;
+              yes)
+                # The hold also disarms GitHub native auto-merge if someone
+                # armed it, or GitHub could still merge the PR. Verified by a
+                # re-read; a hold that cannot be enforced is a red run.
+                if [ "$(echo "$pr" | jq -r 'if .auto_merge == null then "no" else "yes" end')" = "yes" ]; then
+                  # shellcheck disable=SC2016 # $id is a GraphQL variable
+                  gh api graphql -f id="$(echo "$pr" | jq -r '.node_id')" -f query='
+                    mutation($id: ID!) { disablePullRequestAutoMerge(input: {pullRequestId: $id}) { clientMutationId } }' >/dev/null || true
+                  if [ "$(gh api "/repos/$REPO/pulls/$PR_NUMBER" --jq 'if .auto_merge == null then "no" else "yes" end' || echo yes)" != "no" ]; then
+                    echo "::error::#$PR_NUMBER carries ${HOLD_LABEL} but native auto-merge is armed and could not be disabled."
+                    exit 1
+                  fi
+                  say "native auto-merge was armed; disabled it for the ${HOLD_LABEL} hold."
+                fi
+                done_ "held by the ${HOLD_LABEL} label; a person merges it." ;;
               *) done_ "labels unreadable, so the hold cannot be ruled out; not merging." ;;
             esac
             if [ "$(echo "$pr" | jq -r '.head.repo.full_name // empty')" != "$REPO" ]; then
@@ -224,13 +247,31 @@ jobs:
           # Prints green, pending:<why> or red:<why> for HEAD. Never exits the
           # script; an unreadable API is pending, never green.
           checks_state() {
-            local runs statuses rules branch base_enc
+            local runs statuses rules branch base_enc cancelled self_ids id url run_id path
             # A branch name with "/" must be URL-encoded as one path segment
             # (GitHub REST docs, "Get a branch").
             base_enc=$(jq -rn --arg b "$BASE_REF" '$b | @uri')
             if ! runs=$(gh api --paginate "/repos/$REPO/commits/$HEAD/check-runs?per_page=100" --jq '.check_runs[]' | jq -s '.'); then
               echo "pending:could not read check-runs"; return 0
             fi
+            # Newest cancelled Actions jobs: which of them belong to
+            # review-verdict.yml or this file (superseded, not a CI result)?
+            self_ids="[]"
+            cancelled=$(echo "$runs" | jq -r --arg job "$JOB_NAME" '
+              group_by([(.app.slug // ""), .name]) | map(max_by(.id))[]
+              | select((.app.slug // "") == "github-actions" and .conclusion == "cancelled" and .name != $job)
+              | "\(.id) \(.details_url // "")"')
+            while read -r id url; do
+              [ -n "$id" ] || continue
+              run_id=$(printf '%s' "$url" | sed -nE 's#.*/actions/runs/([0-9]+).*#\1#p')
+              if [ -z "$run_id" ] || ! path=$(gh api "/repos/$REPO/actions/runs/$run_id" --jq '.path // empty'); then
+                echo "pending:could not tell which workflow cancelled check ${id} belongs to"; return 0
+              fi
+              case "${path%%@*}" in
+                .github/workflows/review-verdict.yml|.github/workflows/doc-auto-merge.yml)
+                  self_ids=$(echo "$self_ids" | jq --argjson i "$id" '. + [$i]') ;;
+              esac
+            done <<< "$cancelled"
             if ! statuses=$(gh api --paginate "/repos/$REPO/commits/$HEAD/status?per_page=100" --jq '.statuses[]' | jq -s '.'); then
               echo "pending:could not read commit statuses"; return 0
             fi
@@ -241,7 +282,8 @@ jobs:
               echo "pending:could not read branch ${BASE_REF}"; return 0
             fi
             jq -rn --argjson runs "$runs" --argjson st "$statuses" --argjson rules "$rules" \
-                --argjson branch "$branch" --arg job "$JOB_NAME" --arg ign "$IGNORED_CHECKS" '
+                --argjson branch "$branch" --arg job "$JOB_NAME" --arg ign "$IGNORED_CHECKS" \
+                --argjson selfids "$self_ids" '
               def ok: IN("success", "neutral", "skipped");
               def newest: group_by([(.app.slug // ""), .name]) | map(max_by(.id));
               ($ign | split(",") | map(sub("^\\s+"; "") | sub("\\s+$"; "")) | map(select(length > 0))) as $ignored
@@ -251,6 +293,7 @@ jobs:
               | ($st | group_by(.context) | map(max_by([(.updated_at // ""), (.id // 0)]))) as $st
               | ($all | map(select(
                     ((.app.slug // "") == "github-actions" and .name == $job | not)
+                    and (.id as $i | $selfids | index($i) | not)
                     and (((.app.slug // "") + "/" + .name) as $k | $ignored | index($k) | not)))) as $ci
               | ([$rules[]? | select(.type == "required_status_checks")
                   | .parameters.required_status_checks[]? | {context, app: .integration_id}]
@@ -266,7 +309,7 @@ jobs:
                                            and ($r.app == null or $r.app == -1))] | length) == 0)
                   | $r.context] as $missing
               | ([$ci[] | select(.status == "completed"
-                    and (.conclusion | IN("failure", "timed_out", "startup_failure", "stale")))
+                    and (.conclusion | IN("failure", "timed_out", "startup_failure", "stale", "cancelled")))
                   | "\(.name) (\(.conclusion))"]
                 + [$st[] | select(.state == "failure" or .state == "error") | "\(.context) (\(.state))"]) as $red
               | ([$ci[] | select(.status != "completed" or .conclusion == "action_required") | .name]
@@ -301,11 +344,17 @@ jobs:
             qualify
           done
 
-          # Final snapshot, immediately before the merge.
+          # Final snapshot, immediately before the merge: PR metadata and files
+          # again, and CI again (a re-run can turn a check pending or red after
+          # the loop saw green).
           locked_base="$BASE_REF"
           qualify
           if [ "$BASE_REF" != "$locked_base" ]; then
             done_ "base moved while checking; the run for the new state decides."
+          fi
+          state=$(checks_state)
+          if [ "$state" != "green" ]; then
+            done_ "CI changed in the final snapshot (${state#*:}); not merging. A later CI completion re-evaluates."
           fi
 
           say "CI green on ${HEAD:0:7}; squash-merging."
