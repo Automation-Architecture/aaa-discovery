@@ -193,6 +193,7 @@ jobs:
               exit 1
             fi
             say "native auto-merge was armed; disabled it ($1)."
+            PR_CUR=$(echo "$PR_CUR" | jq '.auto_merge = null')
           }
           # Refuse this PR: disarm any native auto-merge, then stop.
           refuse() { disarm_if_armed "$1"; done_ "$1"; }
@@ -216,6 +217,12 @@ jobs:
             if [ "$(echo "$pr" | jq -r 'if .draft == false then "no" else "yes" end')" != "no" ]; then
               done_ "draft; drafts never auto-merge."
             fi
+            # Native auto-merge is never left armed, on any PR: code needs a
+            # deliberate human merge, and a documentation-only PR is merged by
+            # this workflow, whose CI gate (every visible check green) is
+            # stricter than the required checks GitHub waits for (Codex on
+            # the #60 re-sync PRs).
+            disarm_if_armed "this workflow merges documentation-only PRs itself, and code is merged by a person"
             case "$(echo "$pr" | jq -r --arg l "$HOLD_LABEL" '
                 if (.labels | type) != "array" then "unreadable"
                 elif any(.labels[]; .name == $l) then "yes" else "no" end')" in
