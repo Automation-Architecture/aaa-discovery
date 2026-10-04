@@ -60,20 +60,27 @@ name: Doc auto-merge
 # of its own (Codex on .github#76).
 # A check bound to THIS PR counts only for the candidate being merged: its
 # head must be HEAD, and its base must be this PR's `.base.sha` as read in
-# the same snapshot AND either the pinned base tip or the merge base of HEAD
-# and that tip. Any other run bound to this PR (an older base or head, or an
+# the same snapshot, which must still be on the base branch: the pinned tip
+# itself, or an ancestor of it (`compare/<.base.sha>...<tip>` has
+# behind_by 0). Any other run bound to this PR (an older base or head, or an
 # unparseable key) is an older candidate: never green, never red, the check
 # reads as missing (pending) until the producer publishes for the candidate
 # (Codex P1 on the wave-4 re-syncs, e.g. aaa-pr-bot#50). Why not the tip
 # alone: both producers key on the pulls API `.base.sha`, and GitHub does not
-# move that to the base tip when the base advances, nor on a head push. It
-# held the merge base in every stale case surveyed (2026-10-02:
-# aaa-client-dashboard#241, #246, #247, aaa-runbooks#158; #247 got a head
-# push 13 minutes after two base merges and kept the older `.base.sha`). A
-# tip-only rule could never pass such a PR. The merge base is what the
-# squash diff is computed from, and the gate keys the same candidate for it
-# until `.base.sha` changes; a retarget or a refreshed `.base.sha` makes the
-# old key stale here at once. Cancelled-job exceptions (above) are taken
+# move that to the base tip when the base advances, nor on a head push
+# (2026-10-02: aaa-client-dashboard#241, #246, #247, aaa-runbooks#158; #247
+# got a head push 13 minutes after two base merges and kept the older
+# `.base.sha`). A tip-only rule could never pass such a PR. Why not "the tip
+# or the merge base" (the rule before 2026-10-04): a branch forked before the
+# commit `.base.sha` records is behind it, so once the base advances the
+# three commits all differ and no rerun can ever match (Codex P1 on the
+# wave-5 re-syncs, e.g. LKID#317, aios-cdp#379). Ancestry is the property
+# that matters: while `.base.sha` is on the base branch, the producers'
+# `.base.sha...HEAD` compare starts from the same merge base the squash
+# applies, so they judged the diff being merged. A rewritten base branch
+# (`.base.sha` no longer an ancestor of the tip), a retarget or a refreshed
+# `.base.sha` makes the old key stale here at once; an unreadable compare is
+# stale too (pending, never green). Cancelled-job exceptions (above) are taken
 # from the runs left after this PR scoping, so another PR's newer run can
 # never hide this PR's superseded cancellation (Codex P1 on
 # aios-marketing-landing-page#36).
@@ -484,37 +491,36 @@ jobs:
           # Prints green, pending:<why> or red:<why> for HEAD. Never exits the
           # script; an unreadable API is pending, never green.
           checks_state() {
-            local runs statuses rules branch base_enc cancelled self_ids id url run_id path mbase=""
+            local runs statuses rules branch base_enc cancelled self_ids id url run_id path base_ok=0
             # A branch name with "/" must be URL-encoded as one path segment
             # (GitHub REST docs, "Get a branch").
             base_enc=$(jq -rn --arg b "$BASE_REF" '$b | @uri')
             if ! runs=$(gh api --paginate "/repos/$REPO/commits/$HEAD/check-runs?per_page=100" --jq '.check_runs[]' | jq -s '.'); then
               echo "pending:could not read check-runs"; return 0
             fi
-            # The merge base of HEAD and the pinned tip: a PR-bound check keyed
-            # on it describes this candidate (see the header). Unreadable
-            # leaves it empty, which only makes such checks stale (pending).
-            if [[ "$BASE_TIP" =~ ^[0-9a-f]{40}$ ]]; then
+            # Is `.base.sha` still on the base branch (the pinned tip or an
+            # ancestor of it)? Only then does a PR-bound check keyed on it
+            # describe this candidate (see the header). Unreadable leaves 0,
+            # which only makes such checks stale (pending).
+            if [[ "$BASE_TIP" =~ ^[0-9a-f]{40}$ ]] && [[ "$PR_BASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
               if [ "$PR_BASE_SHA" = "$BASE_TIP" ]; then
-                mbase="$BASE_TIP"
-              else
-                mbase=$(gh api "/repos/$REPO/compare/$BASE_TIP...$HEAD?per_page=1" --jq '.merge_base_commit.sha // empty' 2>/dev/null || true)
-                [[ "$mbase" =~ ^[0-9a-f]{40}$ ]] || mbase=""
+                base_ok=1
+              elif [ "$(gh api "/repos/$REPO/compare/$PR_BASE_SHA...$BASE_TIP?per_page=1" --jq '.behind_by' 2>/dev/null || true)" = "0" ]; then
+                base_ok=1
               fi
             fi
             # Each run gets `_b`, its binding (see the header): none (not bound
             # to a PR of this repository), other (another PR), current (this
             # PR, this candidate) or stale (this PR, any other candidate).
             if ! runs=$(echo "$runs" | jq -c --arg repo "$REPO" --arg pr "$PR_NUMBER" --arg head "$HEAD" \
-                --arg pbase "$PR_BASE_SHA" --arg tip "$BASE_TIP" --arg mbase "$mbase" '
+                --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" '
                 def binding:
                   ([(.external_id // "") | strings
                     | capture("^(?<repo>[^#:/\\s]+/[^#:/\\s]+)#(?<n>[0-9]+):(?<rest>.*)$")] | .[0]) as $m
                   | if $m == null or ($m.repo | ascii_downcase) != ($repo | ascii_downcase) then {bound: "none"}
                     elif $m.n != $pr then {bound: "other", n: $m.n}
                     else ([$m.rest | capture("^(?<base>[0-9a-f]{40}):(?<head>[0-9a-f]{40}):")] | .[0]) as $k
-                      | if $k != null and $k.head == $head and $k.base == $pbase
-                           and ($k.base == $tip or ($mbase != "" and $k.base == $mbase))
+                      | if $k != null and $k.head == $head and $k.base == $pbase and $baseok == "1"
                         then {bound: "current", n: $m.n}
                         else {bound: "stale", n: $m.n, base: ($k.base // "?"), head: ($k.head // "?")} end
                     end;
@@ -560,7 +566,7 @@ jobs:
             jq -rn --argjson runs "$runs" --argjson st "$statuses" --argjson rules "$rules" \
                 --argjson branch "$branch" --arg job "$JOB_NAME" --arg ign "$IGNORED_CHECKS" \
                 --argjson selfids "$self_ids" --argjson vercel "$VERCEL_REQUIRED" \
-                --arg pr "$PR_NUMBER" --arg tip "$BASE_TIP" --arg mbase "$mbase" '
+                --arg pr "$PR_NUMBER" --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" '
               def ok: IN("success", "neutral", "skipped");
               def newest: group_by([(.app.slug // ""), .name]) | map(max_by(.id));
               def counts: ._b.bound == "none" or ._b.bound == "current";
@@ -595,8 +601,8 @@ jobs:
                                            and ($r.app == null or $r.app == -1))] | length) == 0)
                   | $r.context
                     + (if any($runs[]; .name == $r.context and ._b.bound == "stale")
-                       then " (bound to an older candidate of this PR; waiting for a run for base \($tip[0:7])"
-                            + (if $mbase != "" and $mbase != $tip then " or merge base \($mbase[0:7])" else "" end)
+                       then " (bound to an older candidate of this PR; waiting for a run for base \($pbase[0:7])"
+                            + (if $baseok != "1" then ", which is not on the base branch (rewritten, retargeted or unreadable)" else "" end)
                             + ")"
                        else "" end)]
                  # Vercel, where the base branch shows the repo deploys with it:
