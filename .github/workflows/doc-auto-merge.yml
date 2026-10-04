@@ -59,28 +59,33 @@ name: Doc auto-merge
 # green: no merge call GitHub would refuse, and the PR waits for a fresh run
 # of its own (Codex on .github#76).
 # A check bound to THIS PR counts only for the candidate being merged: its
-# head must be HEAD, and its base must be this PR's `.base.sha` as read in
-# the same snapshot, which must still be on the base branch: the pinned tip
-# itself, or an ancestor of it (`compare/<.base.sha>...<tip>` has
-# behind_by 0). Any other run bound to this PR (an older base or head, or an
-# unparseable key) is an older candidate: never green, never red, the check
-# reads as missing (pending) until the producer publishes for the candidate
-# (Codex P1 on the wave-4 re-syncs, e.g. aaa-pr-bot#50). Why not the tip
-# alone: both producers key on the pulls API `.base.sha`, and GitHub does not
-# move that to the base tip when the base advances, nor on a head push
-# (2026-10-02: aaa-client-dashboard#241, #246, #247, aaa-runbooks#158; #247
-# got a head push 13 minutes after two base merges and kept the older
-# `.base.sha`). A tip-only rule could never pass such a PR. Why not "the tip
-# or the merge base" (the rule before 2026-10-04): a branch forked before the
-# commit `.base.sha` records is behind it, so once the base advances the
-# three commits all differ and no rerun can ever match (Codex P1 on the
-# wave-5 re-syncs, e.g. LKID#317, aios-cdp#379). Ancestry is the property
-# that matters: while `.base.sha` is on the base branch, the producers'
-# `.base.sha...HEAD` compare starts from the same merge base the squash
-# applies, so they judged the diff being merged. A rewritten base branch
-# (`.base.sha` no longer an ancestor of the tip), a retarget or a refreshed
-# `.base.sha` makes the old key stale here at once; an unreadable compare is
-# stale too (pending, never green). Cancelled-job exceptions (above) are taken
+# head must be HEAD, and its base must be the base its producer keys on for
+# that candidate. The two producers key differently (checked 2026-10-04):
+#   - the delivery gate (key tag = policy revision) keys on the LIVE TIP of
+#     the base branch (policy v2.10, github-candidate-resolver.mjs: the pulls
+#     API `.base.sha` "is never used as the base identity"), and re-evaluates
+#     every open PR when the base branch is pushed. Its run counts only if
+#     keyed on the pinned tip, so a merge never rides on a gate verdict for
+#     an older base (Codex P1 on aaa-pr-bot#50).
+#   - review-verdict.yml (key tag `review-verdict`) keys on the pulls API
+#     `.base.sha`, which GitHub does not move when the base advances (2026-10-02:
+#     aaa-client-dashboard#241, #246, #247, aaa-runbooks#158). Its run counts
+#     if keyed on this PR's `.base.sha` as read in the same snapshot AND that
+#     commit is still on the base branch: the pinned tip or an ancestor of it
+#     (`compare/<.base.sha>...<tip>` has behind_by 0). Not "the tip or the
+#     merge base" (the rule before 2026-10-04): a branch forked before the
+#     commit `.base.sha` records is behind it, so once the base advances all
+#     three differ and no rerun could ever match (Codex P1 on LKID#317,
+#     aios-cdp#379). While `.base.sha` is on the base branch, the verdict's
+#     `.base.sha...HEAD` compare starts from the merge base the squash
+#     applies, so it judged the diff being merged.
+# Any other run bound to this PR (another base or head, a rewritten or
+# retargeted base, an unreadable compare, an unparseable key) is an older
+# candidate: never green, never red. While a check has ONLY such runs for
+# this PR, it holds the PR pending until its producer publishes for the
+# candidate, required or not (Codex P1 on 4s2w-aios-partnership#20,
+# aios-second-brain#45): an optional gate's failure for an older candidate
+# must not vanish into a green verdict. Cancelled-job exceptions (above) are taken
 # from the runs left after this PR scoping, so another PR's newer run can
 # never hide this PR's superseded cancellation (Codex P1 on
 # aios-marketing-landing-page#36).
@@ -513,14 +518,19 @@ jobs:
             # to a PR of this repository), other (another PR), current (this
             # PR, this candidate) or stale (this PR, any other candidate).
             if ! runs=$(echo "$runs" | jq -c --arg repo "$REPO" --arg pr "$PR_NUMBER" --arg head "$HEAD" \
-                --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" '
+                --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" --arg tip "$BASE_TIP" '
                 def binding:
                   ([(.external_id // "") | strings
                     | capture("^(?<repo>[^#:/\\s]+/[^#:/\\s]+)#(?<n>[0-9]+):(?<rest>.*)$")] | .[0]) as $m
                   | if $m == null or ($m.repo | ascii_downcase) != ($repo | ascii_downcase) then {bound: "none"}
                     elif $m.n != $pr then {bound: "other", n: $m.n}
-                    else ([$m.rest | capture("^(?<base>[0-9a-f]{40}):(?<head>[0-9a-f]{40}):")] | .[0]) as $k
-                      | if $k != null and $k.head == $head and $k.base == $pbase and $baseok == "1"
+                    else ([$m.rest | capture("^(?<base>[0-9a-f]{40}):(?<head>[0-9a-f]{40}):(?<tag>.*)$")] | .[0]) as $k
+                      # review-verdict keys on `.base.sha` (on the base branch);
+                      # the gate keys on the live tip (see the header).
+                      | if $k != null and $k.head == $head
+                           and (if $k.tag == "review-verdict"
+                                then $k.base == $pbase and $baseok == "1"
+                                else $tip != "" and $k.base == $tip end)
                         then {bound: "current", n: $m.n}
                         else {bound: "stale", n: $m.n, base: ($k.base // "?"), head: ($k.head // "?")} end
                     end;
@@ -566,7 +576,7 @@ jobs:
             jq -rn --argjson runs "$runs" --argjson st "$statuses" --argjson rules "$rules" \
                 --argjson branch "$branch" --arg job "$JOB_NAME" --arg ign "$IGNORED_CHECKS" \
                 --argjson selfids "$self_ids" --argjson vercel "$VERCEL_REQUIRED" \
-                --arg pr "$PR_NUMBER" --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" '
+                --arg pr "$PR_NUMBER" --arg pbase "$PR_BASE_SHA" --arg baseok "$base_ok" --arg tip "$BASE_TIP" '
               def ok: IN("success", "neutral", "skipped");
               def newest: group_by([(.app.slug // ""), .name]) | map(max_by(.id));
               def counts: ._b.bound == "none" or ._b.bound == "current";
@@ -601,8 +611,10 @@ jobs:
                                            and ($r.app == null or $r.app == -1))] | length) == 0)
                   | $r.context
                     + (if any($runs[]; .name == $r.context and ._b.bound == "stale")
-                       then " (bound to an older candidate of this PR; waiting for a run for base \($pbase[0:7])"
-                            + (if $baseok != "1" then ", which is not on the base branch (rewritten, retargeted or unreadable)" else "" end)
+                       then " (bound to an older candidate of this PR; waiting for a run for "
+                            + (if $r.context == "review/verdict" then "base \($pbase[0:7])"
+                                 + (if $baseok != "1" then ", which is not on the base branch (rewritten, retargeted or unreadable)" else "" end)
+                               else "the base tip \($tip[0:7])" end)
                             + ")"
                        else "" end)]
                  # Vercel, where the base branch shows the repo deploys with it:
@@ -626,9 +638,23 @@ jobs:
                 + [$st[] | select(.state == "failure" or .state == "error") | "\(.context) (\(.state))"]) as $red
               | ([$ci[] | select(.status != "completed" or .conclusion == "action_required") | .name]
                 + [$st[] | select(.state == "pending") | .context]) as $running
+              # A check whose only runs for this PR are older candidates holds
+              # the PR, required or not (see the header): its producer has not
+              # yet published for this candidate.
+              # Identity is (app, name), as everywhere else in this file: a
+              # same-named check from another app neither stands in for the
+              # stale one nor makes it "required" (Codex P1 on .github#86).
+              | ([$runs[] | select(._b.bound == "stale") | {slug: (.app.slug // ""), id: .app.id, name}] | unique
+                 | map(. as $s
+                       | select(([$all[] | select(.name == $s.name and (.app.slug // "") == $s.slug)] | length) == 0
+                                and ([$req[] | select(.context == $s.name
+                                                      and ($s.id != null and .app != null and .app != -1 and .app == $s.id))]
+                                     | length) == 0))
+                 | map("\(.name) (bound to an older candidate of this PR; waiting for a run for this candidate)")) as $stalepend
               | if ($red | length) > 0 then "red:" + ($red | join(", "))
                 elif ($running | length) > 0 then "pending:still running or waiting: " + ($running | unique | join(", "))
                 elif ($missing | length) > 0 then "pending:required check(s) not passed yet: " + ($missing | unique | join(", "))
+                elif ($stalepend | length) > 0 then "pending:check(s) only seen for an older candidate of this PR: " + ($stalepend | join(", "))
                 elif ($shadowed | length) > 0 then "pending:GitHub enforces the newest run of a required check on this commit, and it belongs to another PR or an older candidate: " + ($shadowed | unique | join(", ")) + "; a fresh run for this PR (e.g. gh workflow run review-verdict.yml -f pr_number=" + $pr + " -f head_sha=<head>) clears it"
                 else "green" end' || echo "pending:could not evaluate the checks"
           }
