@@ -54,9 +54,11 @@ The skill (which lives in `aaa-client-dashboard/.claude/skills/aaa-client-init/`
 ## After the skill finishes
 
 1. Review the PR diff (`gh pr view <N>`)
-2. Admin-merge the PR (per the operator's global rule for low-risk additions):
+2. Merge the PR once Codex has reviewed the current head, no P0/P1 finding is open and CI is green
+   (the org ruleset `aaa-agency-delivery-gate` requires `agency-delivery/gate`, with no bypass; no human
+   approval is required). Pin the merge to the head you checked, and never use `--admin`:
    ```bash
-   gh pr merge <N> --admin --squash --delete-branch
+   gh pr merge <N> --squash --delete-branch --match-head-commit <head-sha>
    ```
 3. Add the Jira sync step for this client to `.github/workflows/sync-jira-data.yml`:
    ```yaml
@@ -67,7 +69,7 @@ The skill (which lives in `aaa-client-dashboard/.claude/skills/aaa-client-init/`
        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
      run: python scripts/sync_jira.py --slug <slug> --project-key <KEY>
    ```
-4. Open + admin-merge that PR too
+4. Open that PR too and merge it the same way (Codex reviewed the head, no P0/P1, CI green, `--match-head-commit`)
 5. Trigger the workflow manually so the dashboard pulls fresh data:
    ```bash
    gh workflow run "Sync Jira Data" --repo Automation-Architecture/aaa-client-dashboard --ref main
